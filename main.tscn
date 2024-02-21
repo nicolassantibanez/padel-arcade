@@ -1,0 +1,89 @@
+[gd_scene load_steps=8 format=3 uid="uid://bgtwx06jb5omh"]
+
+[ext_resource type="PackedScene" uid="uid://wje7b75353br" path="res://ballv_2.tscn" id="1_7lfum"]
+[ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://player.tscn" id="1_xs617"]
+[ext_resource type="PackedScene" uid="uid://bhrsdylp2ttbm" path="res://ball.tscn" id="2_dby3c"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dlwry"]
+size = Vector3(10, 2, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5hvn4"]
+size = Vector3(10, 2, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n0t8i"]
+transparency = 1
+albedo_color = Color(0.74902, 1, 1, 0.0980392)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0udrj"]
+material = SubResource("StandardMaterial3D_n0t8i")
+size = Vector3(10, 1, 20)
+
+[node name="Main" type="Node"]
+
+[node name="Ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_dlwry")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_5hvn4")
+
+[node name="Left Wall" type="StaticBody3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 3.48787e-16, 1, -4.37114e-08, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -5.5, 3, 2.08165e-12)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Left Wall"]
+shape = SubResource("BoxShape3D_dlwry")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Left Wall"]
+mesh = SubResource("BoxMesh_0udrj")
+
+[node name="Back Wall" type="StaticBody3D" parent="."]
+transform = Transform3D(2.25947e-15, 4.37114e-08, 1, 1, -4.37114e-08, -3.48787e-16, 4.37114e-08, 1, -4.37114e-08, 2.08165e-12, 3, 10.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Back Wall"]
+shape = SubResource("BoxShape3D_dlwry")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Back Wall"]
+mesh = SubResource("BoxMesh_0udrj")
+
+[node name="Front Wall" type="StaticBody3D" parent="."]
+transform = Transform3D(2.25947e-15, 4.37114e-08, 1, 1, -4.37114e-08, -3.48787e-16, 4.37114e-08, 1, -4.37114e-08, 2.08165e-12, 3, -10.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Front Wall"]
+shape = SubResource("BoxShape3D_dlwry")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Front Wall"]
+mesh = SubResource("BoxMesh_0udrj")
+
+[node name="Right Wall" type="StaticBody3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 3.48787e-16, 1, -4.37114e-08, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, 5.5, 3, 2.08165e-12)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Right Wall"]
+shape = SubResource("BoxShape3D_dlwry")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Right Wall"]
+mesh = SubResource("BoxMesh_0udrj")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, -5.95416e-16, 2.4663e-16, -2.44061e-16, 0.00431093, 0.999991, -5.96474e-16, -0.999991, 0.00431093, 0, 3.41509, 0)
+shadow_enabled = true
+
+[node name="Player" parent="." instance=ExtResource("1_xs617")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2, 0)
+
+[node name="CameraPivot" type="Marker3D" parent="."]
+transform = Transform3D(1, -5.95416e-16, 2.4663e-16, 2.4663e-16, 0.707107, 0.707107, -5.95416e-16, -0.707107, 0.707107, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 30)
+fov = 35.9
+size = 15.0
+
+[node name="Ball" parent="." instance=ExtResource("2_dby3c")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.57186, 8.58229)
+
+[node name="GridMap" type="GridMap" parent="."]
+
+[node name="Ballv2" parent="." instance=ExtResource("1_7lfum")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.41916, 4)
