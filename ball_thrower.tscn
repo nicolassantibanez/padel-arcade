@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3 uid="uid://dg7kca4v4jeq8"]
+
+[ext_resource type="Script" path="res://ball_thrower.gd" id="1_iesqs"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_il2gy"]
+size = Vector3(1, 1.50195, 1.47998)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p53py"]
+albedo_color = Color(0.235294, 0.235294, 0.235294, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_phsd4"]
+material = SubResource("StandardMaterial3D_p53py")
+top_radius = 0.2
+bottom_radius = 0.2
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_quwqd"]
+albedo_color = Color(0.811765, 0.407843, 0.145098, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2gl2n"]
+material = SubResource("StandardMaterial3D_quwqd")
+
+[node name="BallThrower" type="StaticBody3D"]
+script = ExtResource("1_iesqs")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_il2gy")
+
+[node name="Pivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.164774)
+
+[node name="Cannon" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 0.39375, -0.206471)
+mesh = SubResource("CylinderMesh_phsd4")
+skeleton = NodePath("../..")
+
+[node name="Base" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("BoxMesh_2gl2n")
+skeleton = NodePath("../..")

@@ -13,10 +13,10 @@ func _ready():
 	pass # Replace with function body.
 
 func _physics_process(delta):
-	if direction == Vector3.ZERO:
-		var rand_angle = randf() * PI
-		# direction = Vector3(0, 1, -1).rotated(Vector3.UP, rand_angle - rand_angle / 2)
-		direction = Vector3.FORWARD.rotated(Vector3.UP, rand_angle - rand_angle / 2)
+	if direction != Vector3.ZERO:
+		# var rand_angle = randf() * PI
+		# # direction = Vector3(0, 1, -1).rotated(Vector3.UP, rand_angle - rand_angle / 2)
+		# direction = Vector3.FORWARD.rotated(Vector3.UP, rand_angle - rand_angle / 2)
 		target_velocity = direction * speed
 	# var motion = speed * direction * delta
 
