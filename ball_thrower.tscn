@@ -1,40 +1,43 @@
-[gd_scene load_steps=7 format=3 uid="uid://dg7kca4v4jeq8"]
+[gd_scene load_steps=7 format=3 uid="uid://b8mgwdtiripne"]
 
 [ext_resource type="Script" path="res://ball_thrower.gd" id="1_iesqs"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_il2gy"]
-size = Vector3(1, 1.50195, 1.47998)
+[sub_resource type="BoxShape3D" id="BoxShape3D_m0wwv"]
+size = Vector3(1, 1.5, 1.33868)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p53py"]
-albedo_color = Color(0.235294, 0.235294, 0.235294, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t8v51"]
+albedo_color = Color(0.882, 0.408, 0.145, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_phsd4"]
-material = SubResource("StandardMaterial3D_p53py")
+[sub_resource type="BoxMesh" id="BoxMesh_fp8rg"]
+material = SubResource("StandardMaterial3D_t8v51")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lnbbx"]
+albedo_color = Color(0.262745, 0.262745, 0.262745, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_w4fjq"]
+material = SubResource("StandardMaterial3D_lnbbx")
 top_radius = 0.2
 bottom_radius = 0.2
 height = 1.5
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_quwqd"]
-albedo_color = Color(0.811765, 0.407843, 0.145098, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_2gl2n"]
-material = SubResource("StandardMaterial3D_quwqd")
 
 [node name="BallThrower" type="StaticBody3D"]
 script = ExtResource("1_iesqs")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_il2gy")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.108002)
+shape = SubResource("BoxShape3D_m0wwv")
 
 [node name="Pivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.164774)
-
-[node name="Cannon" type="MeshInstance3D" parent="Pivot"]
-transform = Transform3D(1, 0, 0, 0, 0.258819, 0.965926, 0, -0.965926, 0.258819, 0, 0.39375, -0.206471)
-mesh = SubResource("CylinderMesh_phsd4")
-skeleton = NodePath("../..")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, -0.25, -0.274616)
 
 [node name="Base" type="MeshInstance3D" parent="Pivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-mesh = SubResource("BoxMesh_2gl2n")
+mesh = SubResource("BoxMesh_fp8rg")
 skeleton = NodePath("../..")
+
+[node name="Cannon" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, -0.965926, 0, 0.965926, 0.258819, 0, 0.53247, 0.259098)
+mesh = SubResource("CylinderMesh_w4fjq")
+skeleton = NodePath("../..")
+
+[node name="ThrowingPoint" type="Marker3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.699725, 0.987779)

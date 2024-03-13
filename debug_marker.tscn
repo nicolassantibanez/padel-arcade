@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://bqk85u6nu6gao"]
+
+[ext_resource type="Material" path="res://art/mob_eye.material" id="1_vpviy"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_nmq7d"]
+material = ExtResource("1_vpviy")
+radius = 0.2
+height = 0.4
+
+[node name="DebugMarker" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_nmq7d")

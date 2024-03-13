@@ -1,8 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://bgtwx06jb5omh"]
+[gd_scene load_steps=11 format=3 uid="uid://bgtwx06jb5omh"]
 
-[ext_resource type="PackedScene" uid="uid://wje7b75353br" path="res://ballv_2.tscn" id="1_7lfum"]
 [ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://player.tscn" id="1_xs617"]
-[ext_resource type="PackedScene" uid="uid://bhrsdylp2ttbm" path="res://ball.tscn" id="2_dby3c"]
+[ext_resource type="PackedScene" uid="uid://b8mgwdtiripne" path="res://ball_thrower.tscn" id="3_astgh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_pvtli"]
 size = Vector3(10, 2, 20)
@@ -84,7 +83,7 @@ transform = Transform3D(1, -5.95416e-16, 2.4663e-16, -2.44061e-16, 0.00431093, 0
 shadow_enabled = true
 
 [node name="Player" parent="." instance=ExtResource("1_xs617")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2, 4.57118)
 
 [node name="CameraPivot" type="Marker3D" parent="."]
 transform = Transform3D(1, -5.95416e-16, 2.4663e-16, 2.4663e-16, 0.707107, 0.707107, -5.95416e-16, -0.707107, 0.707107, 0, 0, 0)
@@ -94,13 +93,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 30)
 fov = 35.9
 size = 15.0
 
-[node name="Ball" parent="." instance=ExtResource("2_dby3c")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.57186, 8.58229)
-
 [node name="GridMap" type="GridMap" parent="."]
 
-[node name="Ballv2" parent="." instance=ExtResource("1_7lfum")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.41916, 4)
+[node name="BallThrower" parent="." instance=ExtResource("3_astgh")]
+transform = Transform3D(1, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -3.48787e-16, -3.48787e-16, 3.48787e-16, 1, 0, 0.785373, -7.74775)
 
 [node name="Net" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
