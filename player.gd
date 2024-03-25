@@ -5,7 +5,10 @@ extends CharacterBody3D
 # Downward acceleration
 @export var fall_acceleration: float = 75
 
-@onready var hit_zone: Area3D = $HitZone
+@onready var early_hit_zone: Area3D = $OuterHitZone
+@onready var late_hit_zone: Area3D = $LateHitZone
+@onready var inner_hit_zone: Area3D = $InnerHitZone
+@onready var label_hit: RichTextLabel = $LabelHit
 
 var target_velocity: Vector3 = Vector3.ZERO
 var ball_scene: Resource = preload ("res://ball.tscn")
@@ -14,17 +17,47 @@ var debug_marker_scene: Resource = preload ("res://debug_marker.tscn")
 var wall_distance = 10
 
 var can_hit_ball: bool = false
+var ball_in_early_zone: bool = false
+var ball_in_late_zone: bool = false
+var ball_in_inner_zone: bool = false
 var ball_to_hit: Ball = null
+var last_hit_status: String = ""
 
 func _ready():
-	hit_zone.body_entered.connect(_on_hit_zone_body_entered)
-	hit_zone.body_exited.connect(_on_hit_zone_body_exited)
+	early_hit_zone.body_entered.connect(_on_early_hit_zone_body_entered)
+	early_hit_zone.body_exited.connect(_on_early_hit_zone_body_exited)
+
+	late_hit_zone.body_entered.connect(_on_late_hit_zone_body_entered)
+	late_hit_zone.body_exited.connect(_on_late_hit_zone_body_exited)
+
+	inner_hit_zone.body_entered.connect(_on_inner_hit_zone_body_entered)
+	inner_hit_zone.body_exited.connect(_on_inner_hit_zone_body_exited)
 
 func _process(delta):
 	if Input.is_physical_key_pressed(KEY_M):
 		_add_debug_marker(position)
-	if can_hit_ball and Input.is_action_just_pressed("hit_ball"):
-		_deprecated_copy_ball_on_hit(ball_to_hit)
+	
+	if Input.is_action_just_pressed("hit_ball"):
+		if ball_in_inner_zone:
+			print("PERFECT SHOT!")
+			_deprecated_copy_ball_on_hit(ball_to_hit, 0)
+			label_hit.clear()
+			label_hit.add_text("PERFECT SHOT!")
+		elif ball_in_late_zone: # imperfect shot (check if is right or left shot)
+			print("TOO LATE!")
+			var rand_angle = randf() * (-PI / 4)
+			_deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
+			label_hit.clear()
+			label_hit.add_text("TOO LATE!")
+		elif ball_in_early_zone:
+			print("TOO EARLY!")
+			var rand_angle = randf() * PI / 4
+			_deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
+			label_hit.clear()
+			label_hit.add_text("TOO EARLY!")
+		else:
+			label_hit.clear()
+			label_hit.add_text("MISS!")
 
 func _physics_process(delta):
 	# local variable to store the input direction
@@ -57,27 +90,45 @@ func _physics_process(delta):
 	velocity = target_velocity
 	move_and_slide()
 
-func _on_hit_zone_body_entered(body: Node3D):
+func _on_early_hit_zone_body_entered(body: Node3D):
 	if is_instance_of(body, Ball):
-		can_hit_ball = true
+		ball_to_hit = body
+		ball_in_early_zone = true
+
+func _on_early_hit_zone_body_exited(body: Node3D):
+	if is_instance_of(body, Ball):
+		ball_in_early_zone = false
+
+func _on_late_hit_zone_body_entered(body: Node3D):
+	if is_instance_of(body, Ball):
+		ball_to_hit = body
+		ball_in_late_zone = true
+
+func _on_late_hit_zone_body_exited(body: Node3D):
+	if is_instance_of(body, Ball):
+		ball_in_late_zone = false
+
+func _on_inner_hit_zone_body_entered(body: Node3D):
+	if is_instance_of(body, Ball):
+		ball_in_inner_zone = true
 		ball_to_hit = body
 
-func _on_hit_zone_body_exited(body: Node3D):
+func _on_inner_hit_zone_body_exited(body: Node3D):
 	if is_instance_of(body, Ball):
-		can_hit_ball = false
-		ball_to_hit = null
+		ball_in_inner_zone = false
 
 func _add_debug_marker(pos: Vector3):
 	var debug_marker: Node = debug_marker_scene.instantiate()
 	debug_marker.position = pos
 	get_parent().add_child(debug_marker)
 
-func _deprecated_copy_ball_on_hit(body: Ball):
+func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 		var ball_instance: Node = ball_scene.instantiate()
 		ball_instance.position = body.global_position + Vector3.FORWARD
 		# _add_debug_marker(body.global_position)
 		# ball_instance.position = body.position + Vector3.UP * 5
 		body.queue_free()
-		var rand_angle = randf() * PI / 4
-		ball_instance.direction = Vector3(0, 0.3, -1).rotated(Vector3.UP, rand_angle - PI / 8)
+		# var rand_angle = randf() * PI / 4
+		# ball_instance.direction = Vector3(0, 0.3, -1).rotated(Vector3.UP, rand_angle - PI / 8)
+		ball_instance.direction = Vector3(0, 0.3, -1).rotated(Vector3.UP, angle_rotation)
 		get_parent().add_child(ball_instance)
