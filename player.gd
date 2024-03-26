@@ -1,5 +1,11 @@
+class_name Player
 extends CharacterBody3D
 
+signal ball_hit(id: int, hit_type: hitType, ball: Ball)
+
+enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
+
+@export var player_id: int = 1
 # How fast the player moves in meters per second
 @export var speed: float = 14
 # Downward acceleration
@@ -37,22 +43,25 @@ func _process(delta):
 	if Input.is_physical_key_pressed(KEY_M):
 		_add_debug_marker(position)
 	
-	if Input.is_action_just_pressed("hit_ball"):
+	if Input.is_action_just_pressed("hit_ball_" + str(player_id)):
 		if ball_in_inner_zone:
 			print("PERFECT SHOT!")
-			_deprecated_copy_ball_on_hit(ball_to_hit, 0)
+			# _deprecated_copy_ball_on_hit(ball_to_hit, 0)
+			ball_hit.emit(player_id, hitType.PERFECT_HIT, ball_to_hit)
 			label_hit.clear()
 			label_hit.add_text("PERFECT SHOT!")
 		elif ball_in_late_zone: # imperfect shot (check if is right or left shot)
 			print("TOO LATE!")
-			var rand_angle = randf() * (-PI / 4)
-			_deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
+			# var rand_angle = randf() * (-PI / 4)
+			# _deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
+			ball_hit.emit(player_id, hitType.LATE_HIT, ball_to_hit)
 			label_hit.clear()
 			label_hit.add_text("TOO LATE!")
 		elif ball_in_early_zone:
 			print("TOO EARLY!")
-			var rand_angle = randf() * PI / 4
-			_deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
+			# var rand_angle = randf() * PI / 4
+			# _deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
+			ball_hit.emit(player_id, hitType.EARLY_HIT, ball_to_hit)
 			label_hit.clear()
 			label_hit.add_text("TOO EARLY!")
 		else:
@@ -64,13 +73,13 @@ func _physics_process(delta):
 	var direction = Vector3.ZERO
 
 	# We check for each move input and update the direction accordingly
-	if Input.is_action_pressed("move_right"):
+	if Input.is_action_pressed("move_right_" + str(player_id)):
 		direction.x += 1
-	if Input.is_action_pressed("move_left"):
+	if Input.is_action_pressed("move_left_" + str(player_id)):
 		direction.x -= 1
-	if Input.is_action_pressed("move_back"):
+	if Input.is_action_pressed("move_back_" + str(player_id)):
 		direction.z += 1
-	if Input.is_action_pressed("move_forward"):
+	if Input.is_action_pressed("move_forward_" + str(player_id)):
 		direction.z -= 1
 	
 	if direction != Vector3.ZERO: # Si nos estamos moviendo
