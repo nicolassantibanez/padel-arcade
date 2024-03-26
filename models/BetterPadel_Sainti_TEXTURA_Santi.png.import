@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b17ak7nbm7xlo"
-path.s3tc="res://.godot/imported/3MODELS_TEXTURE_PADELBOY_DEFAULT.png-54b777712f5c7d9a5dc0ebaf03720485.s3tc.ctex"
+uid="uid://bu1xgdwwx3ftk"
+path.s3tc="res://.godot/imported/BetterPadel_Sainti_TEXTURA_Santi.png-4b1dd9ec195d6ba0cb58f985fa5ab36f.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ generator_parameters={}
 
 [deps]
 
-source_file="res://3MODELS_TEXTURE_PADELBOY_DEFAULT.png"
-dest_files=["res://.godot/imported/3MODELS_TEXTURE_PADELBOY_DEFAULT.png-54b777712f5c7d9a5dc0ebaf03720485.s3tc.ctex"]
+source_file="res://models/BetterPadel_Sainti_TEXTURA_Santi.png"
+dest_files=["res://.godot/imported/BetterPadel_Sainti_TEXTURA_Santi.png-4b1dd9ec195d6ba0cb58f985fa5ab36f.s3tc.ctex"]
 
 [params]
 

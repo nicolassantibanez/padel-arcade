@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://player.gd" id="1_0kv5k"]
 [ext_resource type="PackedScene" uid="uid://co3vt4erby6w6" path="res://art/player.glb" id="1_knvrf"]
 [ext_resource type="PackedScene" uid="uid://bc8e5lhtm3ctn" path="res://art/PadelBoyFIXED.glb" id="3_oq4eh"]
-[ext_resource type="PackedScene" uid="uid://cm2f1vpsghqlh" path="res://3MODELS.glb" id="4_sbu1h"]
+[ext_resource type="PackedScene" uid="uid://ccpimojhtfoyh" path="res://models/BetterPadel_RY.glb" id="4_l1jv7"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vioid"]
 radius = 0.7
@@ -14,7 +14,7 @@ radius = 2.4
 [sub_resource type="SphereShape3D" id="SphereShape3D_pxuhf"]
 radius = 1.105
 
-[node name="PadelBoy" type="CharacterBody3D"]
+[node name="Ray" type="CharacterBody3D"]
 collision_layer = 4
 script = ExtResource("1_0kv5k")
 
@@ -29,7 +29,7 @@ visible = false
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 2.08165e-12, -2, 2.08165e-12)
 visible = false
 
-[node name="3MODELS" parent="Pivot" instance=ExtResource("4_sbu1h")]
+[node name="BetterPadel_RY" parent="Pivot" instance=ExtResource("4_l1jv7")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 2.08165e-12, -2, 2.08165e-12)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

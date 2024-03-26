@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cm2f1vpsghqlh"
-path="res://.godot/imported/3MODELS.glb-5311eac655f12f064c325ef594f4aded.scn"
+uid="uid://ccpimojhtfoyh"
+path="res://.godot/imported/BetterPadel_RY.glb-10c4eeb45580d0f291279adb7365ccd0.scn"
 
 [deps]
 
-source_file="res://3MODELS.glb"
-dest_files=["res://.godot/imported/3MODELS.glb-5311eac655f12f064c325ef594f4aded.scn"]
+source_file="res://models/BetterPadel_RY.glb"
+dest_files=["res://.godot/imported/BetterPadel_RY.glb-10c4eeb45580d0f291279adb7365ccd0.scn"]
 
 [params]
 
