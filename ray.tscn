@@ -29,7 +29,7 @@ visible = false
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 2.08165e-12, -2, 2.08165e-12)
 visible = false
 
-[node name="BetterPadel_RY" parent="Pivot" instance=ExtResource("4_l1jv7")]
+[node name="Model" parent="Pivot" instance=ExtResource("4_l1jv7")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 2.08165e-12, -2, 2.08165e-12)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]

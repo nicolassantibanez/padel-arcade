@@ -7,7 +7,7 @@ enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 
 @export var player_id: int = 1
 # How fast the player moves in meters per second
-@export var speed: float = 14
+@export var speed: float = 7
 # Downward acceleration
 @export var fall_acceleration: float = 75
 
@@ -15,6 +15,7 @@ enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 @onready var late_hit_zone: Area3D = $LateHitZone
 @onready var inner_hit_zone: Area3D = $InnerHitZone
 @onready var label_hit: RichTextLabel = $LabelHit
+@onready var character_model = $Pivot/Model
 
 var target_velocity: Vector3 = Vector3.ZERO
 var ball_scene: Resource = preload ("res://ball.tscn")
@@ -28,8 +29,11 @@ var ball_in_late_zone: bool = false
 var ball_in_inner_zone: bool = false
 var ball_to_hit: Ball = null
 var last_hit_status: String = ""
+var animation_player: AnimationPlayer = null
 
 func _ready():
+	animation_player = character_model.get_node("./AnimationPlayer")
+
 	early_hit_zone.body_entered.connect(_on_early_hit_zone_body_entered)
 	early_hit_zone.body_exited.connect(_on_early_hit_zone_body_exited)
 
@@ -84,8 +88,11 @@ func _physics_process(delta):
 	
 	if direction != Vector3.ZERO: # Si nos estamos moviendo
 		direction = direction.normalized()
+		animation_player.play("Walk")
 		# Setting the basis property will affect the rotation of the node.
 		$Pivot.basis = Basis.looking_at(direction)
+	else: # No moving
+		animation_player.play("Idle")
 
 	# Ground Velocity
 	target_velocity.x = direction.x * speed
