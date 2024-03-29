@@ -1,0 +1,65 @@
+[gd_scene load_steps=8 format=3 uid="uid://bxjkarins58op"]
+
+[ext_resource type="Script" path="res://player.gd" id="1_0kv5k"]
+[ext_resource type="PackedScene" uid="uid://co3vt4erby6w6" path="res://art/player.glb" id="1_knvrf"]
+[ext_resource type="PackedScene" uid="uid://bc8e5lhtm3ctn" path="res://art/PadelBoyFIXED.glb" id="3_oq4eh"]
+[ext_resource type="PackedScene" uid="uid://ccpimojhtfoyh" path="res://models/BetterPadel_RY.glb" id="4_l1jv7"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_vioid"]
+radius = 0.7
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ur3x4"]
+radius = 2.4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_pxuhf"]
+radius = 1.105
+
+[node name="Ray" type="CharacterBody3D"]
+collision_layer = 4
+script = ExtResource("1_0kv5k")
+
+[node name="Pivot" type="Node3D" parent="."]
+transform = Transform3D(1, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -3.48787e-16, -3.48787e-16, 3.48787e-16, 1, 0, 1.2, 0)
+
+[node name="Character" parent="Pivot" instance=ExtResource("1_knvrf")]
+transform = Transform3D(-1, -8.74228e-08, 3.82137e-15, -1.5246e-23, -4.37114e-08, -1, 8.74228e-08, -1, 4.37114e-08, 0, 0, 0)
+visible = false
+
+[node name="PadelBoyFIXED" parent="Pivot" instance=ExtResource("3_oq4eh")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 2.08165e-12, -2, 2.08165e-12)
+visible = false
+
+[node name="Model" parent="Pivot" instance=ExtResource("4_l1jv7")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 2.08165e-12, -2, 2.08165e-12)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_vioid")
+
+[node name="LateHitZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 0.7, 1.34825)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LateHitZone"]
+shape = SubResource("SphereShape3D_ur3x4")
+
+[node name="OuterHitZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.708078, -0.914)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="OuterHitZone"]
+shape = SubResource("SphereShape3D_ur3x4")
+
+[node name="InnerHitZone" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.708078, 0)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InnerHitZone"]
+shape = SubResource("SphereShape3D_pxuhf")
+
+[node name="LabelHit" type="RichTextLabel" parent="."]
+offset_right = 788.0
+offset_bottom = 384.0
+theme_override_font_sizes/normal_font_size = 50

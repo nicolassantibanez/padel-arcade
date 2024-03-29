@@ -1,7 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://bgtwx06jb5omh"]
+[gd_scene load_steps=13 format=3 uid="uid://bgtwx06jb5omh"]
 
-[ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://player.tscn" id="1_xs617"]
+[ext_resource type="PackedScene" uid="uid://dlcvuqascij4u" path="res://sainti.tscn" id="1_3vn04"]
+[ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://ray.tscn" id="1_xs617"]
 [ext_resource type="PackedScene" uid="uid://b8mgwdtiripne" path="res://ball_thrower.tscn" id="3_astgh"]
+[ext_resource type="PackedScene" uid="uid://fekxh3n8uytp" path="res://match_manager.tscn" id="3_gaq71"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_pvtli"]
 size = Vector3(10, 2, 20)
@@ -82,7 +84,11 @@ mesh = SubResource("BoxMesh_0udrj")
 transform = Transform3D(1, -5.95416e-16, 2.4663e-16, -2.44061e-16, 0.00431093, 0.999991, -5.96474e-16, -0.999991, 0.00431093, 0, 3.41509, 0)
 shadow_enabled = true
 
-[node name="Player" parent="." instance=ExtResource("1_xs617")]
+[node name="Sainti" parent="." instance=ExtResource("1_3vn04")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2.26552, -3.57854)
+player_id = 2
+
+[node name="Player1" parent="." instance=ExtResource("1_xs617")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2, 4.57118)
 
 [node name="CameraPivot" type="Marker3D" parent="."]
@@ -106,3 +112,7 @@ shape = SubResource("BoxShape3D_7q12n")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Net"]
 mesh = SubResource("BoxMesh_1isxm")
+
+[node name="MatchManager" parent="." node_paths=PackedStringArray("player1", "player2") instance=ExtResource("3_gaq71")]
+player1 = NodePath("../Player1")
+player2 = NodePath("../Sainti")
