@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://baw65g2x3vcnq"]
+
+[ext_resource type="Script" path="res://scripts/team_manager.gd" id="1_7qrji"]
+
+[node name="TeamManager" type="Node3D"]
+script = ExtResource("1_7qrji")

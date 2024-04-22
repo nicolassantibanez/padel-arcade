@@ -35,12 +35,12 @@ var animation_player: AnimationPlayer = null
 var _state: PlayerState
 
 #
-func change_to_point_ended_state(won: bool):
+func change_to_point_ended_state(_won: bool):
 	# TODO: Poner animaciones de victoria o derrota
 	# Bloquear movimientos
 	_state = PlayerEndPointState.new()
 
-func change_to_serve_state(won: bool):
+func change_to_serve_state(_won: bool):
 	# TODO: Poner animaciones de victoria o derrota
 	# Bloquear movimientos
 	# Limitar movimientos solo a la mitad de cancha correspondientes
