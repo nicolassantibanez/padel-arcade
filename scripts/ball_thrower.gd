@@ -1,6 +1,6 @@
 extends StaticBody3D
 
-var ball_scene: Resource = preload ("res://ball.tscn")
+var ball_scene: Resource = preload ("res://scenes/ball.tscn")
 
 @onready var throwing_point: Marker3D = $Pivot/ThrowingPoint
 

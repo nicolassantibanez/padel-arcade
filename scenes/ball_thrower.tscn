@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://b8mgwdtiripne"]
 
-[ext_resource type="Script" path="res://ball_thrower.gd" id="1_iesqs"]
+[ext_resource type="Script" path="res://scripts/ball_thrower.gd" id="1_iesqs"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_m0wwv"]
 size = Vector3(1, 1.5, 1.33868)

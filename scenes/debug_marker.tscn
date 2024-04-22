@@ -1,9 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://bqk85u6nu6gao"]
 
-[ext_resource type="Material" path="res://art/mob_eye.material" id="1_vpviy"]
+[ext_resource type="Material" path="res://art/mob_eye.material" id="1_y46og"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_nmq7d"]
-material = ExtResource("1_vpviy")
+material = ExtResource("1_y46og")
 radius = 0.2
 height = 0.4
 

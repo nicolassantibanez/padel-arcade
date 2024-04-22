@@ -1,6 +1,6 @@
 extends Node3D
 
-const ball_scene: Resource = preload ("res://ball.tscn")
+const ball_scene: Resource = preload ("res://scenes/ball.tscn")
 const POINTS = {
 	0: 0,
 	1: 15,
@@ -17,15 +17,19 @@ var team1: Dictionary = {
 	"points" = 0,
 	"games" = 0,
 	"sets" = 0,
-	"players" = []
+	"players" = [],
+	"hit_direction" = -1
 }
 
 var team2: Dictionary = {
 	"points" = 0,
 	"games" = 0,
 	"sets" = 0,
-	"players" = []
+	"players" = [],
+	"hit_direction" = 1
 }
+
+var serving_team = team1
 
 var balls_in_game = {}
 
@@ -48,9 +52,26 @@ func _process(delta):
 				balls_in_game[ball_index] = child
 				child.double_bounce.connect(_on_ball_double_bounce)
 
-# func end_point(winning_team: Team):
-# 	# End point logic
-# 	pass
+func end_point(_winning_team: Dictionary):
+	# End point logic
+	# 1. Tell players that the point has ended
+	for i in len(team1.get("players")):
+		team1.get("players")[i].change_to_point_ended_state(true)
+		team2.get("players")[i].change_to_point_ended_state(true)
+	# 2. Show point replay
+	# TODO: POINT REPLAY
+	# 3. Check if game point
+	# 3.	true -> change to game point state
+	# 			TODO: END CURRENT GAME
+	# 3.	false -> change to serve state
+	# 			TODO: TELL PLAYERS to switch to serve state
+	go_to_serve_state()
+
+func go_to_serve_state():
+	for i in len(team1.get("players")):
+		team1.get("players")[i].change_to_serve_state(true)
+		team2.get("players")[i].change_to_serve_state(true)
+	pass
 
 func _on_ball_double_bounce(ball: Ball):
 	# Add point to correct team
@@ -59,20 +80,14 @@ func _on_ball_double_bounce(ball: Ball):
 	if balls_in_game.has(ball.get_index()):
 		balls_in_game.erase(ball.get_index())
 	ball.queue_free()
+	end_point(team1)
 
-func _on_player_ball_hit(player_id: int, hit_type: Player.hitType, ball: Ball):
+func _on_player_ball_hit(player_id: int, hit_angle: float, ball: Ball):
 	var hit_direction: int = -1
 	print("Player_id:", player_id)
 	if player_id == 2:
 		hit_direction = 1
-	if hit_type == Player.hitType.EARLY_HIT:
-		var rand_angle = randf() * PI / 4
-		_deprecated_copy_ball_on_hit(ball, hit_direction, rand_angle)
-	elif hit_type == Player.hitType.LATE_HIT:
-		var rand_angle = randf() * (-PI / 4)
-		_deprecated_copy_ball_on_hit(ball, hit_direction, rand_angle)
-	elif hit_type == Player.hitType.PERFECT_HIT:
-		_deprecated_copy_ball_on_hit(ball, hit_direction, 0)
+	_deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
 
 func _deprecated_copy_ball_on_hit(ball: Ball, direction: int, angle_rotation: float):
 		var ball_instance: Node = ball_scene.instantiate()

@@ -7,31 +7,25 @@ func _init():
 
 func handle_input(_delta: float, player: Player):
     if Input.is_action_just_pressed("hit_ball_" + str(player.player_id)):
+        player.label_hit.clear()
         if player.ball_in_inner_zone:
-            print("PERFECT SHOT!")
-            # _deprecated_copy_ball_on_hit(ball_to_hit, 0)
-            player.ball_hit.emit(player.player_id, player.hitType.PERFECT_HIT, player.ball_to_hit)
-            player.label_hit.clear()
+            var hit_angle = 0
+            player.ball_hit.emit(player.player_id, hit_angle, player.ball_to_hit)
             player.label_hit.add_text("PERFECT SHOT!")
-        elif player.ball_in_late_zone: # imperfect shot (check if is right or left shot)
-            print("TOO LATE!")
-            # var rand_angle = randf() * (-PI / 4)
-            # _deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
-            player.ball_hit.emit(player.player_id, player.hitType.LATE_HIT, player.ball_to_hit)
-            player.label_hit.clear()
+            print("PERFECT SHOT!")
+        elif player.ball_in_late_zone: # Early shot -> to the left
+            var hit_angle = randf() * (-PI / 4)
+            player.ball_hit.emit(player.player_id, hit_angle, player.ball_to_hit)
             player.label_hit.add_text("TOO LATE!")
-        elif player.ball_in_early_zone:
-            print("TOO EARLY!")
-            # var rand_angle = randf() * PI / 4
-            # _deprecated_copy_ball_on_hit(ball_to_hit, rand_angle)
-            player.ball_hit.emit(player.player_id, player.hitType.EARLY_HIT, player.ball_to_hit)
-            player.label_hit.clear()
+            print("TOO LATE!")
+        elif player.ball_in_early_zone: # Early shot -> to the right
+            var hit_angle = randf() * PI / 4
+            player.ball_hit.emit(player.player_id, hit_angle, player.ball_to_hit)
             player.label_hit.add_text("TOO EARLY!")
+            print("TOO EARLY!")
         else:
-            player.label_hit.clear()
             player.label_hit.add_text("MISS!")
 
-# Writing _delta instead of delta here prevents the unused variable warning.
 func update(delta: float, player: Player):
     var direction = Vector3.ZERO
 

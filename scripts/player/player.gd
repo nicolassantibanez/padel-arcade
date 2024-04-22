@@ -1,7 +1,7 @@
 class_name Player
 extends CharacterBody3D
 
-signal ball_hit(id: int, hit_type: hitType, ball: Ball)
+signal ball_hit(id: int, hit_angle: float, ball: Ball)
 
 enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 
@@ -19,8 +19,8 @@ enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 @onready var character_model = $Pivot/Model
 
 var target_velocity: Vector3 = Vector3.ZERO
-var ball_scene: Resource = preload ("res://ball.tscn")
-var debug_marker_scene: Resource = preload ("res://debug_marker.tscn")
+var ball_scene: Resource = preload ("res://scenes/ball.tscn")
+var debug_marker_scene: Resource = preload ("res://scenes/debug_marker.tscn")
 # TODO: Example distance (obtener dinamicamente desde la cancha)
 var wall_distance = 10
 
@@ -33,6 +33,18 @@ var last_hit_status: String = ""
 var animation_player: AnimationPlayer = null
 
 var _state: PlayerState
+
+#
+func change_to_point_ended_state(won: bool):
+	# TODO: Poner animaciones de victoria o derrota
+	# Bloquear movimientos
+	_state = PlayerEndPointState.new()
+
+func change_to_serve_state(won: bool):
+	# TODO: Poner animaciones de victoria o derrota
+	# Bloquear movimientos
+	# Limitar movimientos solo a la mitad de cancha correspondientes
+	_state = PlayerServeState.new()
 
 func _ready():
 	_state = PlayerPlayState.new()
@@ -54,38 +66,6 @@ func _process(delta):
 
 func _physics_process(delta):
 	_state.update(delta, self)
-	# local variable to store the input direction
-	# var direction = Vector3.ZERO
-
-	# # We check for each move input and update the direction accordingly
-	# if Input.is_action_pressed("move_right_" + str(player_id)):
-	# 	direction.x += 1
-	# if Input.is_action_pressed("move_left_" + str(player_id)):
-	# 	direction.x -= 1
-	# if Input.is_action_pressed("move_back_" + str(player_id)):
-	# 	direction.z += 1
-	# if Input.is_action_pressed("move_forward_" + str(player_id)):
-	# 	direction.z -= 1
-	
-	# if direction != Vector3.ZERO: # Si nos estamos moviendo
-	# 	direction = direction.normalized()
-	# 	animation_player.play("Walk")
-	# 	# Setting the basis property will affect the rotation of the node.
-	# 	$Pivot.basis = Basis.looking_at(direction)
-	# else: # No moving
-	# 	animation_player.play("Idle")
-
-	# # Ground Velocity
-	# target_velocity.x = direction.x * speed
-	# target_velocity.z = direction.z * speed
-
-	# # Vertical velocity
-	# if not is_on_floor(): # Falls when not on the ground
-	# 	target_velocity.y = target_velocity.y - (fall_acceleration * delta)
-
-	# # Moving Character
-	# velocity = target_velocity
-	# move_and_slide()
 
 func _on_early_hit_zone_body_entered(body: Node3D):
 	if is_instance_of(body, Ball):
