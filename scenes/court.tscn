@@ -1,10 +1,18 @@
-[gd_scene load_steps=9 format=3 uid="uid://dyd5s7js1uyid"]
+[gd_scene load_steps=12 format=3 uid="uid://dyd5s7js1uyid"]
+
+[ext_resource type="Script" path="res://scripts/court.gd" id="1_erid1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_pvtli"]
 size = Vector3(10, 2, 20)
 
 [sub_resource type="BoxMesh" id="BoxMesh_5hvn4"]
 size = Vector3(10, 2, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ygfr0"]
+size = Vector3(10, 2.5, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_86hd3"]
+size = Vector3(10, 2.5, 10)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dlwry"]
 size = Vector3(10, 1, 20)
@@ -29,8 +37,9 @@ material = SubResource("StandardMaterial3D_j4vuu")
 size = Vector3(10, 1, 0.2)
 
 [node name="Court" type="Node"]
+script = ExtResource("1_erid1")
 
-[node name="Ground" type="StaticBody3D" parent="."]
+[node name="Ground" type="StaticBody3D" parent="." groups=["valid_serve"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
@@ -38,6 +47,19 @@ shape = SubResource("BoxShape3D_pvtli")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("BoxMesh_5hvn4")
+
+[node name="FrontSideArea3D" type="Area3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, -5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/FrontSideArea3D"]
+shape = SubResource("BoxShape3D_ygfr0")
+
+[node name="BackSideArea3D" type="Area3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 5)
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Ground/BackSideArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
+shape = SubResource("BoxShape3D_86hd3")
 
 [node name="Left Wall" type="StaticBody3D" parent="."]
 transform = Transform3D(-4.37114e-08, -1, 3.48787e-16, 1, -4.37114e-08, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -5.5, 3, 2.08165e-12)

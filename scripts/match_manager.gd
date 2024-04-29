@@ -1,5 +1,8 @@
+@tool
+class_name MatchManager
 extends Node3D
 
+signal update_points_ui(teams: Array[TeamManager])
 signal point_ended(winning_team: TeamManager)
 signal game_ended()
 signal set_ended()
@@ -18,15 +21,33 @@ const POINTS = {
 @export var player1: Player
 @export var player2: Player
 
-var teams = []
+var teams: Array[TeamManager] = []
 var serving_team: TeamManager
 var current_turn_index: int
+var ui_manager: UIManager
+var court: Court
 
 var balls_in_game = {}
+var _state: MatchManagerState
+
+# Use setters to update the configuration warning automatically.
+func _get_configuration_warnings():
+	var warnings = []
+
+	for co_node in get_parent().get_children():
+		if is_instance_of(co_node, UIManager):
+			ui_manager = co_node
+	
+	if not ui_manager:
+		warnings.append("UIManager is missing in the scene tree!")
+
+	# Returning an empty array means "no warning".
+	return warnings
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_load_teams()
+	_state = MatchManagerStartState.new()
+	_load_dependencies()
 	if randf() <= 0.5:
 		serving_team = teams[0]
 	else:
@@ -39,6 +60,11 @@ func _ready():
 		self.game_ended.connect(team._on_game_ended)
 		self.set_ended.connect(team._on_set_ended)
 		self.serve_ended.connect(team._on_serve_ended)
+	# Connect UIManager's signals
+	update_points_ui.connect(ui_manager.on_update_points)
+	# Connect Court's signals
+	court.front_side_ball_touch.connect(_on_court_front_side_ball_touch)
+	court.back_side_ball_touch.connect(_on_court_back_side_ball_touch)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
@@ -49,14 +75,18 @@ func _process(_delta):
 			if not balls_in_game.has(ball_index):
 				balls_in_game[ball_index] = child
 				child.double_bounce.connect(_on_ball_double_bounce)
-	if teams.length() < 2:
+	if teams.size() < 2:
 		print("ERROR: Need at least to teams to have a valid match")
 
-func _load_teams():
+func _load_dependencies():
 	for co_node in get_parent().get_children():
 		if is_instance_of(co_node, TeamManager):
 			teams.append(co_node)
 			co_node.points = 0
+		elif is_instance_of(co_node, UIManager):
+			ui_manager = co_node
+		elif is_instance_of(co_node, Court):
+			court = co_node
 
 func go_to_point_ended_state():
 	var winning_index = (current_turn_index + 1) % 2
@@ -76,6 +106,7 @@ func go_to_point_ended_state():
 		go_to_game_ended_state()
 	else:
 		winning_team.add_point()
+		update_points_ui.emit(teams)
 		# TODO: TELL PLAYERS to switch to serve state
 		go_to_serve_state()
 
@@ -96,6 +127,12 @@ func last_game_point_played(winning_team: TeamManager, losing_team: TeamManager)
 	if winning_team.points == 4 or (winning_team.points == 3 and losing_team.points < 3):
 		return true
 	return false
+
+func _on_court_front_side_ball_touch():
+	pass
+
+func _on_court_back_side_ball_touch():
+	pass
 
 func _on_ball_double_bounce(ball: Ball):
 	# Add point to correct team

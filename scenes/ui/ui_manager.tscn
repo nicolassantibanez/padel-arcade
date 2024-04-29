@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3 uid="uid://wn5bfvtvc1ij"]
+
+[ext_resource type="Script" path="res://scripts/ui_manager.gd" id="1_mck10"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0heul"]
+font_size = 42
+
+[node name="UI Manager" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mck10")
+
+[node name="HBoxContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.002
+anchor_top = 0.862
+anchor_right = 0.162
+anchor_bottom = 1.0
+offset_left = 0.16
+offset_top = 7.03995
+offset_right = 0.959999
+offset_bottom = -1.0
+
+[node name="VSplitContainer" type="VSplitContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(250, 2.08165e-12)
+layout_mode = 2
+
+[node name="TopPanel" type="PanelContainer" parent="HBoxContainer/VSplitContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel"]
+layout_mode = 2
+text = "P1: 0"
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="BottomPanel" type="PanelContainer" parent="HBoxContainer/VSplitContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel"]
+layout_mode = 2
+text = "P2: 0"
+label_settings = SubResource("LabelSettings_0heul")

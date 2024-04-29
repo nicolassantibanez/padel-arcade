@@ -1,7 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://bgtwx06jb5omh"]
+[gd_scene load_steps=8 format=3 uid="uid://bgtwx06jb5omh"]
 
 [ext_resource type="PackedScene" uid="uid://fekxh3n8uytp" path="res://scenes/match_manager.tscn" id="1_gk0sv"]
+[ext_resource type="PackedScene" uid="uid://wn5bfvtvc1ij" path="res://scenes/ui/ui_manager.tscn" id="2_50bfa"]
 [ext_resource type="PackedScene" uid="uid://dyd5s7js1uyid" path="res://scenes/court.tscn" id="2_ycrtk"]
+[ext_resource type="PackedScene" uid="uid://baw65g2x3vcnq" path="res://scenes/team_manager.tscn" id="3_3vumr"]
 [ext_resource type="PackedScene" uid="uid://dlcvuqascij4u" path="res://scenes/sainti.tscn" id="3_ll6s8"]
 [ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://scenes/ray.tscn" id="4_x6w7s"]
 [ext_resource type="PackedScene" uid="uid://b8mgwdtiripne" path="res://scenes/ball_thrower.tscn" id="5_ymuh5"]
@@ -9,8 +11,10 @@
 [node name="Main" type="Node"]
 
 [node name="MatchManager" parent="." node_paths=PackedStringArray("player1", "player2") instance=ExtResource("1_gk0sv")]
-player1 = NodePath("../Player1")
-player2 = NodePath("../Sainti")
+player1 = NodePath("../TeamManager/Player1")
+player2 = NodePath("../TeamManager2/Sainti")
+
+[node name="UI Manager" parent="." instance=ExtResource("2_50bfa")]
 
 [node name="Court" parent="." instance=ExtResource("2_ycrtk")]
 
@@ -18,12 +22,16 @@ player2 = NodePath("../Sainti")
 transform = Transform3D(1, -5.95416e-16, 2.4663e-16, -2.44061e-16, 0.00431093, 0.999991, -5.96474e-16, -0.999991, 0.00431093, 0, 3.41509, 0)
 shadow_enabled = true
 
-[node name="Sainti" parent="." instance=ExtResource("3_ll6s8")]
+[node name="TeamManager" parent="." instance=ExtResource("3_3vumr")]
+
+[node name="Player1" parent="TeamManager" instance=ExtResource("4_x6w7s")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2, 4.57118)
+
+[node name="TeamManager2" parent="." instance=ExtResource("3_3vumr")]
+
+[node name="Sainti" parent="TeamManager2" instance=ExtResource("3_ll6s8")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2.26552, -3.57854)
 player_id = 2
-
-[node name="Player1" parent="." instance=ExtResource("4_x6w7s")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2, 4.57118)
 
 [node name="CameraPivot" type="Marker3D" parent="."]
 transform = Transform3D(1, -5.95416e-16, 2.4663e-16, 2.4663e-16, 0.707107, 0.707107, -5.95416e-16, -0.707107, 0.707107, 0, 0, 0)
