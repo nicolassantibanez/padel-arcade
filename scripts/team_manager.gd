@@ -46,8 +46,10 @@ func _on_point_ended(winning_team: TeamManager):
 
 func _on_game_ended():
 	pass
+
 func _on_set_ended():
 	pass
+
 func _on_serve_ended():
 	for player in players:
 		player.change_to_play_state()

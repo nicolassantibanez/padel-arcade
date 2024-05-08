@@ -48,7 +48,7 @@ func _process(delta):
 	pass
 
 func disable_detector():
-	area_detector.monitoring = false
+	area_detector.set_deferred("monitoring", false)
 
 func _on_area_detector_area_entered(body: Node3D):
 	if is_instance_of(body, CourtSection):

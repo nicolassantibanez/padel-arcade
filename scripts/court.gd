@@ -7,10 +7,10 @@ signal steel_ball_touch()
 
 @onready var ground: StaticBody3D = $Ground
 @onready var net: StaticBody3D = $Net
-@onready var front_wall: StaticBody3D = $"Front Wall"
-@onready var back_wall: StaticBody3D = $"Back Wall"
-@onready var right_wall: StaticBody3D = $"Right Wall"
-@onready var left_wall: StaticBody3D = $"Left Wall"
+@onready var front_wall: StaticBody3D = $"Walls/Front Wall"
+@onready var back_wall: StaticBody3D = $"Walls/Back Wall"
+@onready var right_wall: StaticBody3D = $"Walls/Right Wall"
+@onready var left_wall: StaticBody3D = $"Walls/Left Wall"
 @onready var front_server_marker: Marker3D = $FrontServerPosition
 @onready var front_teammate_marker: Marker3D = $FrontTeammatePosition
 @onready var back_server_marker: Marker3D = $BackServerPosition

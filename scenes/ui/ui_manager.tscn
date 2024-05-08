@@ -15,33 +15,84 @@ grow_vertical = 2
 script = ExtResource("1_mck10")
 
 [node name="HBoxContainer" type="CenterContainer" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.002
-anchor_top = 0.862
-anchor_right = 0.162
-anchor_bottom = 1.0
-offset_left = 0.16
-offset_top = 7.03995
-offset_right = 0.959999
-offset_bottom = -1.0
+layout_mode = 0
+offset_left = 38.0
+offset_top = 896.0
+offset_right = 947.0
+offset_bottom = 1024.0
 
 [node name="VSplitContainer" type="VSplitContainer" parent="HBoxContainer"]
-custom_minimum_size = Vector2(250, 2.08165e-12)
+custom_minimum_size = Vector2(500, 2.08165e-12)
 layout_mode = 2
 
 [node name="TopPanel" type="PanelContainer" parent="HBoxContainer/VSplitContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VSplitContainer/TopPanel"]
 layout_mode = 2
-text = "P1: 0"
+
+[node name="PlayerLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "P1: "
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="PointsLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="Divider" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = " | "
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="GamesLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="Divider2" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = " | "
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="SetsLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+layout_mode = 2
+text = "0"
 label_settings = SubResource("LabelSettings_0heul")
 
 [node name="BottomPanel" type="PanelContainer" parent="HBoxContainer/VSplitContainer"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VSplitContainer/BottomPanel"]
 layout_mode = 2
-text = "P2: 0"
+
+[node name="PlayerLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = "P2: "
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="PointsLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="Divider" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = " | "
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="GamesLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="Divider2" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = " | "
+label_settings = SubResource("LabelSettings_0heul")
+
+[node name="SetsLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+layout_mode = 2
+text = "0"
 label_settings = SubResource("LabelSettings_0heul")
