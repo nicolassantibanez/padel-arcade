@@ -3,6 +3,7 @@ extends Node
 
 signal front_side_ball_touch
 signal back_side_ball_touch
+signal steel_ball_touch()
 
 @onready var ground: StaticBody3D = $Ground
 @onready var net: StaticBody3D = $Net
@@ -10,26 +11,59 @@ signal back_side_ball_touch
 @onready var back_wall: StaticBody3D = $"Back Wall"
 @onready var right_wall: StaticBody3D = $"Right Wall"
 @onready var left_wall: StaticBody3D = $"Left Wall"
+@onready var front_server_marker: Marker3D = $FrontServerPosition
+@onready var front_teammate_marker: Marker3D = $FrontTeammatePosition
+@onready var back_server_marker: Marker3D = $BackServerPosition
+@onready var back_teammate_marker: Marker3D = $BackTeammatePosition
 
+var debug_marker_scene: Resource = preload ("res://scenes/debug_marker.tscn")
 #
-func get_serving_zones() -> Array[Dictionary]:
-	# FIX: For the moment I'll assume serving boxes are at the middle
-	var front_side: Area3D = ground.get_node("./FronSideArea3D")
-	var front_collision_shape: CollisionShape3D = front_side.get_node("./CollisionShape3D")
-	var back_side: Area3D = ground.get_node("./FronSideArea3D")
-	var back_collision_shape: CollisionShape3D = back_side.get_node("./CollisionShape3D")
-	# FIX: Aquí me equivoqué. Recordar que estamos calculando dónde el jugador tiene que estar al servir
-	# Por esto mismo, hay que cambiar el z_limits de ambos lados
-	return [
+func get_serving_positions(current_points_sum: int) -> Array[Dictionary]:
+	var is_even_point_turn: bool = true if current_points_sum % 2 == 0 else false
+
+	var front_server_pos: Vector3
+	var front_teammate_pos: Vector3
+	var back_server_pos: Vector3
+	var back_teammate_pos: Vector3
+	print("Nodo listo?:", is_node_ready())
+	if is_even_point_turn:
+		front_server_pos = front_server_marker.position
+		front_teammate_pos = front_teammate_marker.position
+		back_server_pos = back_server_marker.position
+		back_teammate_pos = back_teammate_marker.position
+	else: # odd points
+		front_server_pos = front_server_marker.position + 2 * Vector3.LEFT * front_server_marker.position.x
+		front_teammate_pos = front_teammate_marker.position + 2 * Vector3.RIGHT * front_teammate_marker.position.x
+		back_server_pos = back_server_marker.position - 2 * Vector3.RIGHT * back_server_marker.position.x
+		back_teammate_pos = back_teammate_marker.position - 2 * Vector3.LEFT * back_teammate_marker.position.x
+
+	var zones: Array[Dictionary] = [
 		{
-			"x_limits": Vector2(front_side.position.x - front_collision_shape.get_size().x, front_side.position.x + front_collision_shape.get_size().x),
-			"z_limits": Vector2(front_side.position.z - front_collision_shape.get_size().z, front_side.position.z + front_collision_shape.get_size().z),
+			"server_pos": front_server_pos,
+			"teammate_pos": front_teammate_pos,
+			"hit_direction": - 1
 		},
 		{
-			"x_limits": Vector2(back_side.position.x - back_collision_shape.get_size().x, back_side.position.x + back_collision_shape.get_size().x),
-			"z_limits": Vector2(back_side.position.z - back_collision_shape.get_size().z, back_side.position.z + back_collision_shape.get_size().z),
-		},
+			"server_pos": back_server_pos,
+			"teammate_pos": back_teammate_pos,
+			"hit_direction": 1
+		}
 	]
+	# for i in range(2):
+	# 	var debug_marker: Node = debug_marker_scene.instantiate()
+	# 	if i == 0:
+	# 		debug_marker.position = Vector3(zones[0]['x_limits'].x, 1, 0)
+	# 	else:
+	# 		debug_marker.position = Vector3(zones[0]['x_limits'].y, 1, 0)
+	# 	self.add_child(debug_marker)
+	# for i in range(2):
+	# 	var debug_marker: Node = debug_marker_scene.instantiate()
+	# 	if i == 0:
+	# 		debug_marker.position = Vector3(0, 1, zones[0]['z_limits'].x)
+	# 	else:
+	# 		debug_marker.position = Vector3(0, 1, zones[0]['z_limits'].y)
+	# 	self.add_child(debug_marker)
+	return zones
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

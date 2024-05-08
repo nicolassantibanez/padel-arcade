@@ -2,6 +2,7 @@ class_name Player
 extends CharacterBody3D
 
 signal ball_hit(id: int, hit_angle: float, ball: Ball)
+signal service_hit(player: Player)
 
 enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 
@@ -40,11 +41,17 @@ func change_to_point_ended_state(_won: bool):
 	# Bloquear movimientos
 	_state = PlayerEndPointState.new()
 
-func change_to_serve_state(_won: bool):
-	# TODO: Poner animaciones de victoria o derrota
-	# Bloquear movimientos
-	# Limitar movimientos solo a la mitad de cancha correspondientes
-	_state = PlayerServeState.new()
+func change_to_wait_state(wait_position: Vector3):
+	_state = PlayerWaitState.new(self, wait_position)
+
+func change_to_receive_state(receive_position: Vector3):
+	_state = PlayerReceiveState.new(self, receive_position)
+
+func change_to_serve_state(serving_position: Vector3):
+	_state = PlayerServeState.new(self, serving_position)
+
+func change_to_play_state():
+	_state = PlayerPlayState.new()
 
 func _ready():
 	_state = PlayerPlayState.new()
@@ -109,3 +116,60 @@ func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 		# ball_instance.direction = Vector3(0, 0.3, -1).rotated(Vector3.UP, rand_angle - PI / 8)
 		ball_instance.direction = Vector3(0, 0.3, -1).rotated(Vector3.UP, angle_rotation)
 		get_parent().add_child(ball_instance)
+
+func free_input():
+	if Input.is_action_just_pressed("hit_ball_" + str(player_id)):
+		label_hit.clear()
+		if ball_in_inner_zone:
+			var hit_angle = 0
+			ball_hit.emit(player_id, hit_angle, ball_to_hit)
+			label_hit.add_text("PERFECT SHOT!")
+			print("PERFECT SHOT!")
+		elif ball_in_late_zone: # Early shot -> to the left
+			var hit_angle = randf() * (-PI / 4)
+			ball_hit.emit(player_id, hit_angle, ball_to_hit)
+			label_hit.add_text("TOO LATE!")
+			print("TOO LATE!")
+		elif ball_in_early_zone: # Early shot -> to the right
+			var hit_angle = randf() * PI / 4
+			ball_hit.emit(player_id, hit_angle, ball_to_hit)
+			label_hit.add_text("TOO EARLY!")
+			print("TOO EARLY!")
+		else:
+			label_hit.add_text("MISS!")
+
+# Manages Player's free movement
+# ALRERT: Only use inside physics process
+func normal_movement(delta):
+	var direction = Vector3.ZERO
+
+	# We check for each move input and update the direction accordingly
+	if Input.is_action_pressed("move_right_" + str(player_id)):
+		direction.x += 1
+	if Input.is_action_pressed("move_left_" + str(player_id)):
+		direction.x -= 1
+	if Input.is_action_pressed("move_back_" + str(player_id)):
+		direction.z += 1
+	if Input.is_action_pressed("move_forward_" + str(player_id)):
+		direction.z -= 1
+
+	if direction != Vector3.ZERO: # Si nos estamos moviendo
+		direction = direction.normalized()
+		animation_player.play("Walk")
+		# Setting the basis property will affect the rotation of the node.
+		pivot.basis = Basis.looking_at(direction)
+	else: # No moving
+		animation_player.play("Idle")
+
+	# Ground Velocity
+	var to_move = Vector3(direction.x * speed, 0, direction.z * speed)
+
+	target_velocity.x = to_move.x
+	target_velocity.z = to_move.z
+	# Vertical velocity
+	if not is_on_floor(): # Falls when not on the ground
+		target_velocity.y = target_velocity.y - (fall_acceleration * delta)
+
+	# Moving Character
+	velocity = target_velocity
+	move_and_slide()

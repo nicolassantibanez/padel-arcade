@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3 uid="uid://c0dw07p47da2r"]
+
+[ext_resource type="Script" path="res://scripts/invisible_cage.gd" id="1_kq8sj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7siky"]
+size = Vector3(5, 2, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0lh5d"]
+size = Vector3(0.2, 2, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_53iya"]
+size = Vector3(0.2, 2, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sw6bd"]
+size = Vector3(5, 2, 0.2)
+
+[node name="InvisibleCage" type="StaticBody3D"]
+script = ExtResource("1_kq8sj")
+
+[node name="BackWall" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.25)
+shape = SubResource("BoxShape3D_7siky")
+
+[node name="RightWall" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.25, 0, 0)
+shape = SubResource("BoxShape3D_0lh5d")
+
+[node name="LeftWall" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.25, 0, 0)
+shape = SubResource("BoxShape3D_53iya")
+
+[node name="FrontWall" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.25)
+shape = SubResource("BoxShape3D_sw6bd")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.920123, 0.391631, 0, -0.391631, 0.920123, 0, 6.03404, 9.99145)

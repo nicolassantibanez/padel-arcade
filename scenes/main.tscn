@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bgtwx06jb5omh"]
+[gd_scene load_steps=10 format=3 uid="uid://bgtwx06jb5omh"]
 
 [ext_resource type="PackedScene" uid="uid://fekxh3n8uytp" path="res://scenes/match_manager.tscn" id="1_gk0sv"]
 [ext_resource type="PackedScene" uid="uid://wn5bfvtvc1ij" path="res://scenes/ui/ui_manager.tscn" id="2_50bfa"]
@@ -6,17 +6,49 @@
 [ext_resource type="PackedScene" uid="uid://baw65g2x3vcnq" path="res://scenes/team_manager.tscn" id="3_3vumr"]
 [ext_resource type="PackedScene" uid="uid://dlcvuqascij4u" path="res://scenes/sainti.tscn" id="3_ll6s8"]
 [ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://scenes/ray.tscn" id="4_x6w7s"]
-[ext_resource type="PackedScene" uid="uid://b8mgwdtiripne" path="res://scenes/ball_thrower.tscn" id="5_ymuh5"]
+
+[sub_resource type="Animation" id="Animation_tge3r"]
+resource_name = "match_begin"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/MatchBeginLabel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_ds2fo"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/MatchBeginLabel:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_en1x5"]
+_data = {
+"RESET": SubResource("Animation_ds2fo"),
+"match_begin": SubResource("Animation_tge3r")
+}
 
 [node name="Main" type="Node"]
 
-[node name="MatchManager" parent="." node_paths=PackedStringArray("player1", "player2") instance=ExtResource("1_gk0sv")]
-player1 = NodePath("../TeamManager/Player1")
-player2 = NodePath("../TeamManager2/Sainti")
+[node name="MatchManager" parent="." instance=ExtResource("1_gk0sv")]
 
 [node name="UI Manager" parent="." instance=ExtResource("2_50bfa")]
-
-[node name="Court" parent="." instance=ExtResource("2_ycrtk")]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, -5.95416e-16, 2.4663e-16, -2.44061e-16, 0.00431093, 0.999991, -5.96474e-16, -0.999991, 0.00431093, 0, 3.41509, 0)
@@ -25,7 +57,7 @@ shadow_enabled = true
 [node name="TeamManager" parent="." instance=ExtResource("3_3vumr")]
 
 [node name="Player1" parent="TeamManager" instance=ExtResource("4_x6w7s")]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2, 4.57118)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 2.5241, 0.55033, 7.48056)
 
 [node name="TeamManager2" parent="." instance=ExtResource("3_3vumr")]
 
@@ -41,7 +73,24 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 30)
 fov = 35.9
 size = 15.0
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CameraPivot"]
+libraries = {
+"": SubResource("AnimationLibrary_en1x5")
+}
+
+[node name="Control" type="Control" parent="CameraPivot"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MatchBeginLabel" type="Label" parent="CameraPivot/Control"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Welcome to a new match!"
+
 [node name="GridMap" type="GridMap" parent="."]
 
-[node name="BallThrower" parent="." instance=ExtResource("5_ymuh5")]
-transform = Transform3D(1, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -3.48787e-16, -3.48787e-16, 3.48787e-16, 1, 0, 0.785373, -7.74775)
+[node name="Court" parent="." instance=ExtResource("2_ycrtk")]
