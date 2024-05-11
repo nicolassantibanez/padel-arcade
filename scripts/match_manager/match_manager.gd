@@ -224,6 +224,12 @@ func _on_ball_invalid_serve(ball: Ball):
 		go_to_second_service()
 	ball.queue_free()
 
+func _on_ball_fault(ball: Ball):
+	print("FAULT!")
+	ball.disable_detector()
+	go_to_point_ended(FoulType.OUT)
+	ball.queue_free()
+
 # func _on_ball_invalid_serve(ball: Ball):
 # 	ball.disable_detector()
 # 	if balls_in_game.has(ball.get_index()):
@@ -268,7 +274,7 @@ func create_new_ball(ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_
 func _connect_to_ball_signals(ball: Ball):
 	ball.double_bounce.connect(_on_ball_double_bounce)
 	ball.invalid_serve.connect(_on_ball_invalid_serve)
-	# ball.invalid_serve.connect(_on_ball_double_bounce)
+	ball.fault.connect(_on_ball_fault)
 # signal invalid_serve(ball: Ball)
 # signal fault(ball: Ball)
 
