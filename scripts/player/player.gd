@@ -15,7 +15,6 @@ enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 @onready var early_hit_zone: Area3D = $OuterHitZone
 @onready var late_hit_zone: Area3D = $LateHitZone
 @onready var inner_hit_zone: Area3D = $InnerHitZone
-@onready var label_hit: RichTextLabel = $LabelHit
 @onready var pivot = $Pivot
 @onready var character_model = $Pivot/Model
 
@@ -118,24 +117,20 @@ func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 
 func free_input():
 	if Input.is_action_just_pressed("hit_ball_" + str(player_id)):
-		label_hit.clear()
 		if ball_in_inner_zone:
 			var hit_angle = 0
 			ball_hit.emit(player_id, hit_angle, ball_to_hit)
-			label_hit.add_text("PERFECT SHOT!")
 			print("PERFECT SHOT!")
 		elif ball_in_late_zone: # Early shot -> to the left
 			var hit_angle = randf() * (-PI / 4)
 			ball_hit.emit(player_id, hit_angle, ball_to_hit)
-			label_hit.add_text("TOO LATE!")
 			print("TOO LATE!")
 		elif ball_in_early_zone: # Early shot -> to the right
 			var hit_angle = randf() * PI / 4
 			ball_hit.emit(player_id, hit_angle, ball_to_hit)
-			label_hit.add_text("TOO EARLY!")
 			print("TOO EARLY!")
 		else:
-			label_hit.add_text("MISS!")
+			print("TOO EARLY!")
 
 # Manages Player's free movement
 # ALRERT: Only use inside physics process

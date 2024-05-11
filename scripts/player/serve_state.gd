@@ -17,8 +17,6 @@ func handle_input(_delta: float, player: Player):
     # Emit signal, that u have serve
     # Manager passes to play state & so do players
     if Input.is_action_just_pressed("hit_ball_" + str(player.player_id)):
-        player.label_hit.clear()
-        player.label_hit.add_text("SERVE!")
         player.service_hit.emit(player)
 
 func update(delta: float, player: Player):
