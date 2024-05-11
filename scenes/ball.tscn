@@ -14,7 +14,7 @@ radius = 0.1
 height = 0.2
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_8u3ay"]
-radius = 0.1
+radius = 0.105
 
 [node name="Ball" type="CharacterBody3D"]
 collision_layer = 2

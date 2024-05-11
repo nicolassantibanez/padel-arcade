@@ -22,8 +22,6 @@ enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 var target_velocity: Vector3 = Vector3.ZERO
 var ball_scene: Resource = preload ("res://scenes/ball.tscn")
 var debug_marker_scene: Resource = preload ("res://scenes/debug_marker.tscn")
-# TODO: Example distance (obtener dinamicamente desde la cancha)
-var wall_distance = 10
 
 var can_hit_ball: bool = false
 var ball_in_early_zone: bool = false
@@ -32,6 +30,7 @@ var ball_in_inner_zone: bool = false
 var ball_to_hit: Ball = null
 var last_hit_status: String = ""
 var animation_player: AnimationPlayer = null
+var playing_ball: Ball
 
 var _state: PlayerState
 
@@ -50,11 +49,11 @@ func change_to_receive_state(receive_position: Vector3):
 func change_to_serve_state(serving_position: Vector3):
 	_state = PlayerServeState.new(self, serving_position)
 
-func change_to_play_state():
-	_state = PlayerPlayState.new()
+func change_to_play_state(new_ball: Ball):
+	_state = PlayerPlayState.new(self, new_ball)
 
 func _ready():
-	_state = PlayerPlayState.new()
+	_state = PlayerPlayState.new(self, null)
 	animation_player = character_model.get_node("./AnimationPlayer")
 
 	early_hit_zone.body_entered.connect(_on_early_hit_zone_body_entered)

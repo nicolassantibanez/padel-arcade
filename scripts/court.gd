@@ -25,28 +25,33 @@ func get_serving_positions(current_points_sum: int) -> Array[Dictionary]:
 	var front_teammate_pos: Vector3
 	var back_server_pos: Vector3
 	var back_teammate_pos: Vector3
+	var hit_angle: float
 	print("Nodo listo?:", is_node_ready())
 	if is_even_point_turn:
 		front_server_pos = front_server_marker.position
 		front_teammate_pos = front_teammate_marker.position
 		back_server_pos = back_server_marker.position
 		back_teammate_pos = back_teammate_marker.position
+		hit_angle = PI / 8
 	else: # odd points
 		front_server_pos = front_server_marker.position + 2 * Vector3.LEFT * front_server_marker.position.x
 		front_teammate_pos = front_teammate_marker.position + 2 * Vector3.RIGHT * front_teammate_marker.position.x
 		back_server_pos = back_server_marker.position - 2 * Vector3.RIGHT * back_server_marker.position.x
 		back_teammate_pos = back_teammate_marker.position - 2 * Vector3.LEFT * back_teammate_marker.position.x
+		hit_angle = -PI / 8
 
 	var zones: Array[Dictionary] = [
 		{
 			"server_pos": front_server_pos,
 			"teammate_pos": front_teammate_pos,
-			"hit_direction": - 1
+			"hit_direction": - 1,
+			"hit_angle": hit_angle
 		},
 		{
 			"server_pos": back_server_pos,
 			"teammate_pos": back_teammate_pos,
-			"hit_direction": 1
+			"hit_direction": 1,
+			"hit_angle": hit_angle
 		}
 	]
 	# for i in range(2):

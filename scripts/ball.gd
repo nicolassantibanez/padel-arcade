@@ -43,10 +43,6 @@ func _physics_process(delta):
 		velocity = target_velocity
 		move_and_collide(reflect * 0.95)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-
 func disable_detector():
 	area_detector.set_deferred("monitoring", false)
 
@@ -59,6 +55,7 @@ func _on_area_detector_area_entered(body: Node3D):
 		bounces_count += 1
 		print("Entered area:", body.name)
 		if body.section_type == CourtSection.SECTION_TYPE.WALL:
+			print("WALL COLLISION!")
 			handle_wall_collision()
 		elif body.section_type == CourtSection.SECTION_TYPE.FENCE:
 			handle_fence_collision()

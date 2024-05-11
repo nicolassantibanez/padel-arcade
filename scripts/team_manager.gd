@@ -13,6 +13,7 @@ var serving_player_index: int = 0
 
 var is_team_serving: bool = false
 var hit_direction: int
+var service_hit_angle: float
 
 func add_point():
 	points += 1
@@ -24,6 +25,7 @@ func change_to_serve_state(turn_to_serve: bool, serving_zone: Dictionary):
 	print("IN team: ", self, "change_to_serve_state")
 	is_team_serving = turn_to_serve
 	hit_direction = serving_zone["hit_direction"]
+	service_hit_angle = serving_zone["hit_angle"]
 	for i in range(len(players)):
 		var player = players[i]
 		if is_team_serving:
@@ -50,9 +52,9 @@ func _on_game_ended():
 func _on_set_ended():
 	pass
 
-func _on_serve_ended():
+func _on_serve_ended(new_ball: Ball):
 	for player in players:
-		player.change_to_play_state()
+		player.change_to_play_state(new_ball)
 
 # Use setters to update the configuration warning automatically.
 func _get_configuration_warnings():
@@ -93,6 +95,6 @@ func _on_player_service_hit(serving_player: Player):
 		# - Hit LEFT or RIGHT (depending court side and serving side)
 		# - HIT DIRECTION: should be a variable that should be updated by the match manager
 	if players[serving_player_index].player_id == serving_player.player_id:
-		var hit_angle = PI / 8
+		var hit_angle = service_hit_angle
 		service_hit.emit(hit_direction, hit_angle, serving_player.global_position + Vector3.UP)
 	# _deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)

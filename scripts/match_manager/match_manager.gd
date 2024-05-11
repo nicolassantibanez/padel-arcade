@@ -7,7 +7,7 @@ signal point_ended(winning_team: TeamManager)
 signal game_ended
 signal set_ended
 signal match_ended
-signal serve_ended
+signal serve_ended(new_ball: Ball)
 
 const ball_scene: Resource = preload ("res://scenes/ball.tscn")
 const POINTS = {
@@ -43,6 +43,7 @@ var current_turn_index: int
 var ui_manager: UIManager
 var court: Court
 var current_ball: Ball
+var is_second_service: bool = false
 
 var balls_in_game = {}
 
@@ -130,9 +131,8 @@ func go_to_point_ended(foul_type: FoulType):
 		losing_team = teams[current_turn_index]
 	else: # TODO: Add other foultypes conditions
 		print("Wadafak happened?")
-		winning_index = next_team_index(current_turn_index)
-		winning_team = teams[winning_index]
-		losing_team = teams[current_turn_index]
+		winning_team = teams[current_turn_index]
+		losing_team = teams[next_team_index(current_turn_index)]
 
 	print("POINT ENDED!")
 	# 1. Tell players that the point has ended
@@ -150,6 +150,9 @@ func go_to_point_ended(foul_type: FoulType):
 			winning_team.add_point()
 		_update_points()
 		_serve_setup() # Notify Players to switch to serve state
+
+func go_to_second_service():
+	_serve_setup()
 
 func _update_points():
 	for i in range(len(teams)):
@@ -208,6 +211,18 @@ func _on_ball_double_bounce(ball: Ball):
 	# Remove ball, some time later
 	# The team that was waiting for it's turn, wins the point
 	go_to_point_ended(FoulType.DOUBLE_BOUNCE)
+	ball.queue_free()
+
+func _on_ball_invalid_serve(ball: Ball):
+	print("INVALID SERVE! SECOND SERVICE!")
+	ball.disable_detector()
+	if is_second_service:
+		is_second_service = false
+		go_to_point_ended(FoulType.OUT)
+	else:
+		is_second_service = true
+		go_to_second_service()
+	ball.queue_free()
 
 # func _on_ball_invalid_serve(ball: Ball):
 # 	ball.disable_detector()
@@ -216,9 +231,18 @@ func _on_ball_double_bounce(ball: Ball):
 # 	ball.queue_free()
 # 	_state.on_ball_invalid_serve()
 
-func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball: Ball):
+func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
 	_end_current_team_turn()
-	_deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
+	create_new_ball(ball_hit.global_position, false, hit_direction, hit_angle)
+	ball_hit.queue_free()
+	# redirect_ball(hit_direction, hit_angle, ball_hit)
+
+func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
+	_end_current_team_turn()
+	ball.is_serve_ball = false
+	ball.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle)
+	ball.target_velocity = ball.direction * ball.speed
+	# _connect_to_ball_signals(current_ball)
 
 ## Callback function when the serving team plays it's service
 ## 
@@ -226,8 +250,8 @@ func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball: Ball):
 ## - Notify every team that the service has been played
 func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3):
 	_end_current_team_turn()
-	create_new_ball(ball_pos, true, hit_direction, hit_angle)
-	serve_ended.emit()
+	var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle)
+	serve_ended.emit(new_ball)
 
 ## Creates a new ball for the match
 ## returns the new ball instance
@@ -243,17 +267,10 @@ func create_new_ball(ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_
 
 func _connect_to_ball_signals(ball: Ball):
 	ball.double_bounce.connect(_on_ball_double_bounce)
-	# ball.invalid_serve.connect(_on_ball_invalid_serve)
+	ball.invalid_serve.connect(_on_ball_invalid_serve)
 	# ball.invalid_serve.connect(_on_ball_double_bounce)
 # signal invalid_serve(ball: Ball)
 # signal fault(ball: Ball)
-
-func _on_player_ball_hit(player_id: int, hit_angle: float, ball: Ball):
-	var hit_direction: int = -1
-	print("Player_id:", player_id)
-	if player_id == 2:
-		hit_direction = 1
-	_deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
 
 func _deprecated_copy_ball_on_hit(ball: Ball, direction: int, angle_rotation: float):
 		var ball_instance: Node = ball_scene.instantiate()
