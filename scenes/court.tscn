@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dyd5s7js1uyid"]
+[gd_scene load_steps=18 format=3 uid="uid://dyd5s7js1uyid"]
 
 [ext_resource type="Script" path="res://scripts/court.gd" id="1_erid1"]
 [ext_resource type="Script" path="res://scripts/court_section.gd" id="2_6u8nj"]
@@ -14,6 +14,20 @@ size = Vector3(10, 2.5, 10)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_86hd3"]
 size = Vector3(10, 2.5, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_udbjb"]
+size = Vector3(5, 2.5, 7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hlf42"]
+transparency = 1
+albedo_color = Color(0.560784, 0.105882, 0.396078, 0.882353)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xqa3h"]
+material = SubResource("StandardMaterial3D_hlf42")
+size = Vector3(5, 2.1, 7)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gjwop"]
+size = Vector3(5, 2.5, 7)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dlwry"]
 size = Vector3(10, 1, 20)
@@ -45,6 +59,7 @@ script = ExtResource("1_erid1")
 
 [node name="Ground" type="StaticBody3D" parent="." groups=["valid_serve"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+script = ExtResource("2_6u8nj")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
 shape = SubResource("BoxShape3D_pvtli")
@@ -54,26 +69,44 @@ mesh = SubResource("BoxMesh_5hvn4")
 
 [node name="BackSideArea3D" type="Area3D" parent="Ground"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, -5)
+collision_layer = 9
 script = ExtResource("2_6u8nj")
-section_type = 3
+section_type = 5
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/BackSideArea3D"]
 shape = SubResource("BoxShape3D_ygfr0")
 
 [node name="FrontSideArea3D" type="Area3D" parent="Ground"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 5)
+collision_layer = 9
 script = ExtResource("2_6u8nj")
-section_type = 1
+section_type = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/FrontSideArea3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 2.08165e-12)
 shape = SubResource("BoxShape3D_86hd3")
 
+[node name="FrontServingZone" type="Area3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.08165e-12, 3.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/FrontServingZone"]
+shape = SubResource("BoxShape3D_udbjb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground/FrontServingZone"]
+mesh = SubResource("BoxMesh_xqa3h")
+
+[node name="BackServingZone" type="Area3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2.08165e-12, -3.5)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/BackServingZone"]
+shape = SubResource("BoxShape3D_gjwop")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground/BackServingZone"]
+mesh = SubResource("BoxMesh_xqa3h")
+
 [node name="Walls" type="Node" parent="."]
 
 [node name="WallsArea3D" type="Area3D" parent="Walls"]
-script = ExtResource("2_6u8nj")
-section_type = 5
 
 [node name="LeftWallCollision" type="CollisionShape3D" parent="Walls/WallsArea3D"]
 transform = Transform3D(-4.37114e-08, -1, 3.48787e-16, 1, -4.37114e-08, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -5.5, 3, 2.08165e-12)
@@ -93,6 +126,8 @@ shape = SubResource("BoxShape3D_dlwry")
 
 [node name="Left Wall" type="StaticBody3D" parent="Walls"]
 transform = Transform3D(-4.37114e-08, -1, 3.48787e-16, 1, -4.37114e-08, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -5.5, 3, 2.08165e-12)
+script = ExtResource("2_6u8nj")
+section_type = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Left Wall"]
 shape = SubResource("BoxShape3D_dlwry")
@@ -102,6 +137,8 @@ mesh = SubResource("BoxMesh_0udrj")
 
 [node name="Front Wall" type="StaticBody3D" parent="Walls"]
 transform = Transform3D(2.25947e-15, 4.37114e-08, 1, 1, -4.37114e-08, -3.48787e-16, 4.37114e-08, 1, -4.37114e-08, 2.08165e-12, 3, 10.5)
+script = ExtResource("2_6u8nj")
+section_type = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Front Wall"]
 shape = SubResource("BoxShape3D_dlwry")
@@ -111,6 +148,8 @@ mesh = SubResource("BoxMesh_0udrj")
 
 [node name="Back Wall" type="StaticBody3D" parent="Walls"]
 transform = Transform3D(2.25947e-15, 4.37114e-08, 1, 1, -4.37114e-08, -3.48787e-16, 4.37114e-08, 1, -4.37114e-08, 2.08165e-12, 3, -10.5)
+script = ExtResource("2_6u8nj")
+section_type = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Back Wall"]
 shape = SubResource("BoxShape3D_dlwry")
@@ -120,6 +159,8 @@ mesh = SubResource("BoxMesh_0udrj")
 
 [node name="Right Wall" type="StaticBody3D" parent="Walls"]
 transform = Transform3D(-4.37114e-08, -1, 3.48787e-16, 1, -4.37114e-08, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, 5.5, 3, 2.08165e-12)
+script = ExtResource("2_6u8nj")
+section_type = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/Right Wall"]
 shape = SubResource("BoxShape3D_dlwry")
@@ -129,6 +170,8 @@ mesh = SubResource("BoxMesh_0udrj")
 
 [node name="Net" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+script = ExtResource("2_6u8nj")
+section_type = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Net"]
 shape = SubResource("BoxShape3D_7q12n")
@@ -137,14 +180,11 @@ shape = SubResource("BoxShape3D_7q12n")
 mesh = SubResource("BoxMesh_1isxm")
 
 [node name="CourtCenterLine" type="Area3D" parent="Net"]
-script = ExtResource("2_6u8nj")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Net/CourtCenterLine"]
 shape = SubResource("WorldBoundaryShape3D_b2pka")
 
 [node name="NetArea3D" type="Area3D" parent="Net"]
-script = ExtResource("2_6u8nj")
-section_type = 2
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Net/NetArea3D"]
 shape = SubResource("BoxShape3D_7q12n")

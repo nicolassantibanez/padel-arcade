@@ -1,11 +1,13 @@
 extends CharacterBody3D
 class_name Ball
 
-signal double_bounce(ball: Ball)
-signal invalid_serve(ball: Ball)
-signal fault(ball: Ball)
+signal cross_side()
+signal ground_bounce(ball: Ball)
+signal wall_bounce(ball: Ball)
+signal fence_bounce(ball: Ball)
+signal net_bounce(ball: Ball)
 
-@onready var area_detector: Area3D = $Area3D
+@onready var ray_cast: RayCast3D = $RayCast3D
 
 var direction = Vector3.ZERO
 
@@ -16,17 +18,26 @@ var air_acc: float = 3
 var bounces_count = 0
 var floor_bounce_count = 0
 
-var speed = 15
+var signals_enabled = true
+# var speed = 15
+var speed = 16
 var target_velocity: Vector3 = Vector3.ZERO
 var is_serve_ball: bool = false
 var first_bounce_was_net: bool = false
-var crossed_side: bool = false
+var is_serving_side: bool = true
+var current_side: CourtSection.SECTION_TYPE
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	target_velocity = direction * speed
-	area_detector.area_entered.connect(_on_area_detector_area_entered)
-	area_detector.area_exited.connect(_on_area_detector_area_exited)
+
+func _process(_delta):
+	if ray_cast.is_colliding():
+		var collider = ray_cast.get_collider()
+		if is_instance_of(collider, CourtSection) and current_side != collider.section_type:
+			current_side = collider.section_type
+			is_serving_side = not is_serving_side
+			cross_side.emit()
 
 func _physics_process(delta):
 	target_velocity = target_velocity - target_velocity.normalized() * air_acc * delta
@@ -38,58 +49,28 @@ func _physics_process(delta):
 	velocity = target_velocity
 	var collision: KinematicCollision3D = move_and_collide(target_velocity * delta)
 	if collision:
+		if is_instance_of(collision.get_collider(), CourtSection) and signals_enabled:
+			manage_court_sections_collisions(collision.get_collider())
 		var reflect = collision.get_remainder().bounce(collision.get_normal())
 		target_velocity = velocity.bounce(collision.get_normal()) * 0.95
 		velocity = target_velocity
 		move_and_collide(reflect * 0.95)
 
 func disable_detector():
-	area_detector.set_deferred("monitoring", false)
+	signals_enabled = false
+	ray_cast.set_deferred("enabled", false)
 
-func _on_area_detector_area_entered(body: Node3D):
-	if is_instance_of(body, CourtSection):
-		if body.section_type == CourtSection.SECTION_TYPE.COURT_LINE:
-			print("Crossed middle!!")
-			crossed_side = true
-			return
-		bounces_count += 1
-		print("Entered area:", body.name)
-		if body.section_type == CourtSection.SECTION_TYPE.WALL:
-			print("WALL COLLISION!")
-			handle_wall_collision()
-		elif body.section_type == CourtSection.SECTION_TYPE.FENCE:
-			handle_fence_collision()
-		elif body.section_type in [CourtSection.SECTION_TYPE.FRONT_SIDE, CourtSection.SECTION_TYPE.BACK_SIDE]:
-			floor_bounce_count += 1
-			if floor_bounce_count == 2:
-				print("DOUBLE BOUNCE!")
-				double_bounce.emit(self)
-
-func _on_area_detector_area_exited(body: Node3D):
-	if is_instance_of(body, CourtSection):
-		if body.section_type == CourtSection.SECTION_TYPE.COURT_LINE:
-			crossed_side = true
-
-func handle_wall_collision():
-	if is_serve_ball:
-		if crossed_side:
-			if bounces_count == 1:
-				invalid_serve.emit(self)
-		else:
-			invalid_serve.emit(self)
-	else:
-		if crossed_side:
-			if bounces_count == 1:
-				fault.emit(self)
-
-func handle_fence_collision():
-	if is_serve_ball:
-		if crossed_side:
-			if bounces_count <= 2:
-				invalid_serve.emit(self)
-		else:
-			invalid_serve.emit(self)
-	else:
-		if crossed_side:
-			if bounces_count == 1:
-				fault.emit(self)
+func manage_court_sections_collisions(section: CourtSection):
+	bounces_count += 1
+	if section.section_type == CourtSection.SECTION_TYPE.WALL:
+		print("WALL BOUNCE!")
+		wall_bounce.emit(self)
+	elif section.section_type == CourtSection.SECTION_TYPE.FENCE:
+		fence_bounce.emit(self)
+	elif section.section_type == CourtSection.SECTION_TYPE.NET:
+		print("NET BOUNCE!")
+		net_bounce.emit(self)
+	elif section.section_type == CourtSection.SECTION_TYPE.GROUND:
+		print("FlOOR BOUNCE!")
+		floor_bounce_count += 1
+		ground_bounce.emit(self)

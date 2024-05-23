@@ -18,7 +18,7 @@ const POINTS = {
 	4: "ADV"
 }
 
-enum FoulType {DOUBLE_BOUNCE, OUT}
+enum FaultType {DOUBLE_BOUNCE, OUT}
 enum State {PAUSE, PLAY}
 
 var teams: Array[TeamManager] = []
@@ -40,15 +40,16 @@ var serving_team_index: int
 ## Stores the index of Team that has the current turn
 ## End of turn: when team hits the ball or the point ends
 var current_turn_index: int
+var last_turn_index: int
 var ui_manager: UIManager
 var court: Court
 var current_ball: Ball
+var is_serving = false
 var is_second_service: bool = false
+var hit_net_on_service = false
+var ball_in_hitter_side = true
 
 var balls_in_game = {}
-
-func foul(foul_type: FoulType):
-	print("FOUUUL!: ", foul_type)
 
 # Use setters to update the configuration warning automatically.
 func _get_configuration_warnings():
@@ -98,6 +99,7 @@ func start_game():
 
 # Put players into positions for a new service
 func _serve_setup():
+	hit_net_on_service = false
 	var total_points: int = get_total_played_points()
 	var serving_positions = court.get_serving_positions(total_points)
 	for i in range(len(teams)):
@@ -120,20 +122,7 @@ func _load_dependencies():
 			court = co_node
 
 ## Function that manages the logic when a point ends
-func go_to_point_ended(foul_type: FoulType):
-	var winning_index: int
-	var winning_team: TeamManager
-	var losing_team: TeamManager
-	if foul_type == FoulType.DOUBLE_BOUNCE:
-		# The team that was waiting for it's turn, wins the point
-		winning_index = next_team_index(current_turn_index)
-		winning_team = teams[winning_index]
-		losing_team = teams[current_turn_index]
-	else: # TODO: Add other foultypes conditions
-		print("Wadafak happened?")
-		winning_team = teams[current_turn_index]
-		losing_team = teams[next_team_index(current_turn_index)]
-
+func go_to_point_ended(winning_team: TeamManager, losing_team: TeamManager):
 	print("POINT ENDED!")
 	# 1. Tell players that the point has ended
 	point_ended.emit(winning_team)
@@ -201,43 +190,13 @@ func last_game_point_played(winning_team: TeamManager, losing_team: TeamManager)
 
 ## Passes the turn to the next Team
 func _end_current_team_turn():
+	last_turn_index = current_turn_index
 	current_turn_index = (current_turn_index + 1) % 2
-
-## Callback function when the ball makes a double bounce
-func _on_ball_double_bounce(ball: Ball):
-	# We disable the ball's area detector, so it can stop sending signals
-	ball.disable_detector()
-	# Add point to correct team
-	# Remove ball, some time later
-	# The team that was waiting for it's turn, wins the point
-	go_to_point_ended(FoulType.DOUBLE_BOUNCE)
-	ball.queue_free()
-
-func _on_ball_invalid_serve(ball: Ball):
-	print("INVALID SERVE! SECOND SERVICE!")
-	ball.disable_detector()
-	if is_second_service:
-		is_second_service = false
-		go_to_point_ended(FoulType.OUT)
-	else:
-		is_second_service = true
-		go_to_second_service()
-	ball.queue_free()
-
-func _on_ball_fault(ball: Ball):
-	print("FAULT!")
-	ball.disable_detector()
-	go_to_point_ended(FoulType.OUT)
-	ball.queue_free()
-
-# func _on_ball_invalid_serve(ball: Ball):
-# 	ball.disable_detector()
-# 	if balls_in_game.has(ball.get_index()):
-# 		balls_in_game.erase(ball.get_index())
-# 	ball.queue_free()
-# 	_state.on_ball_invalid_serve()
+	# current_turn_index = -1
 
 func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
+	ball_in_hitter_side = true
+	is_serving = false
 	_end_current_team_turn()
 	create_new_ball(ball_hit.global_position, false, hit_direction, hit_angle)
 	ball_hit.queue_free()
@@ -255,6 +214,8 @@ func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
 ## - Create new serve Ball
 ## - Notify every team that the service has been played
 func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3):
+	ball_in_hitter_side = true
+	is_serving = true
 	_end_current_team_turn()
 	var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle)
 	serve_ended.emit(new_ball)
@@ -272,11 +233,74 @@ func create_new_ball(ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_
 	return ball_instance
 
 func _connect_to_ball_signals(ball: Ball):
-	ball.double_bounce.connect(_on_ball_double_bounce)
-	ball.invalid_serve.connect(_on_ball_invalid_serve)
-	ball.fault.connect(_on_ball_fault)
-# signal invalid_serve(ball: Ball)
-# signal fault(ball: Ball)
+	ball.ground_bounce.connect(_on_ball_ground_bounce)
+	ball.wall_bounce.connect(_on_ball_wall_bounce)
+	ball.fence_bounce.connect(_on_ball_fence_bounce)
+	ball.net_bounce.connect(_on_ball_net_bounce)
+	ball.cross_side.connect(_on_ball_cross_side)
+
+func _on_ball_ground_bounce(ball: Ball):
+	if is_serving:
+		print("BAll is serrving!!")
+		if ball_in_hitter_side: # cayó en el mismo lado
+			print("Cayó en el mismo lado :cccc")
+			call_fault(ball, FaultType.OUT)
+			return
+		else: # cayó en lado correcto
+			if ball.bounces_count == 1 and not court.ball_hit_serving_zone(ball.global_position, get_total_played_points()):
+				print("FUERA DEL SERVICE BOX")
+				call_fault(ball, FaultType.OUT)
+				return
+			elif ball.bounces_count >= 2 and hit_net_on_service:
+				hit_net_on_service = false
+				print("NET! Repeat Service")
+				go_to_second_service() # repeat service
+				return
+	print("Floor bounce count: ", ball.floor_bounce_count)
+	if ball_in_hitter_side:
+		print("OWN SIDE BOUNCE!")
+		call_fault(ball, FaultType.OUT)
+		return
+	if ball.floor_bounce_count == 2:
+		call_fault(ball, FaultType.OUT)
+
+func _on_ball_wall_bounce(ball: Ball):
+	if ball.bounces_count == 1:
+		if current_turn_index != - 1: # Pelota cruzó, y ya golpeó el último turno
+			call_fault(ball, FaultType.OUT)
+
+func _on_ball_fence_bounce(ball: Ball):
+	if ball.bounces_count == 1: # No importa si la pelota cruza o no, siempre el primero choque con reja es falta
+		call_fault(ball, FaultType.OUT)
+
+func _on_ball_net_bounce(ball: Ball):
+	if is_serving:
+		if ball.bounces_count == 1:
+			hit_net_on_service = true
+
+func _on_ball_cross_side():
+	ball_in_hitter_side = false
+
+func call_fault(ball: Ball, fault: FaultType):
+	print("FAULT!")
+	ball.disable_detector()
+	if is_serving:
+		print("INVALID SERVE!")
+		if is_second_service:
+			is_second_service = false
+			go_to_point_ended(teams[next_team_index(serving_team_index)], serving_team)
+		else:
+			print("SECOND SERVICE!")
+			is_second_service = true
+			go_to_second_service()
+	else:
+		match fault:
+			FaultType.OUT:
+				go_to_point_ended(teams[next_team_index(last_turn_index)], teams[last_turn_index])
+			FaultType.DOUBLE_BOUNCE:
+				go_to_point_ended(teams[last_turn_index], teams[next_team_index(last_turn_index)])
+
+	ball.queue_free()
 
 func _deprecated_copy_ball_on_hit(ball: Ball, direction: int, angle_rotation: float):
 		var ball_instance: Node = ball_scene.instantiate()

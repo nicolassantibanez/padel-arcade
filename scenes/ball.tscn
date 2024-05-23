@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://wje7b75353br"]
+[gd_scene load_steps=5 format=3 uid="uid://wje7b75353br"]
 
 [ext_resource type="Script" path="res://scripts/ball.gd" id="1_iu8fe"]
 
@@ -13,9 +13,6 @@ material = SubResource("StandardMaterial3D_bief8")
 radius = 0.1
 height = 0.2
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_8u3ay"]
-radius = 0.105
-
 [node name="Ball" type="CharacterBody3D"]
 collision_layer = 2
 collision_mask = 3
@@ -27,7 +24,8 @@ shape = SubResource("SphereShape3D_quv3c")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_3jrjq")
 
-[node name="Area3D" type="Area3D" parent="."]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("SphereShape3D_8u3ay")
+[node name="RayCast3D" type="RayCast3D" parent="."]
+target_position = Vector3(2.08165e-12, -10, 2.08165e-12)
+collision_mask = 8
+collide_with_areas = true
+collide_with_bodies = false

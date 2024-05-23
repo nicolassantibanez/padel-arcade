@@ -66,7 +66,7 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2.26552, -3.57854)
 player_id = 2
 
 [node name="CameraPivot" type="Marker3D" parent="."]
-transform = Transform3D(1, -5.95416e-16, 2.4663e-16, 2.4663e-16, 0.707107, 0.707107, -5.95416e-16, -0.707107, 0.707107, 0, 0, 0)
+transform = Transform3D(1, -5.95416e-16, 2.4663e-16, 4.16307e-16, 0.888921, 0.45806, -4.9197e-16, -0.45806, 0.888921, 0, 0, 0)
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.08165e-12, 2.08165e-12, 30)

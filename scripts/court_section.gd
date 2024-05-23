@@ -1,6 +1,6 @@
 class_name CourtSection
-extends Area3D
+extends Node3D
 
-enum SECTION_TYPE {COURT_LINE, FRONT_SIDE, NET, BACK_SIDE, FENCE, WALL}
+enum SECTION_TYPE {GROUND, NET, FENCE, WALL, FRONT_SIDE, BACK_SIDE}
 
 @export var section_type: SECTION_TYPE
