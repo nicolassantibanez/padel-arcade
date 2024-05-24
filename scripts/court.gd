@@ -19,6 +19,8 @@ signal steel_ball_touch()
 @onready var back_serving_zone: Area3D = $Ground/BackServingZone
 
 var debug_marker_scene: Resource = preload ("res://scenes/debug_marker.tscn")
+var front_serving_zone_initial_pos: Vector3
+var back_serving_zone_initial_pos: Vector3
 #
 func get_serving_positions(current_points_sum: int) -> Array[Dictionary]:
 	var is_even_point_turn: bool = true if current_points_sum % 2 == 0 else false
@@ -28,13 +30,19 @@ func get_serving_positions(current_points_sum: int) -> Array[Dictionary]:
 	var back_server_pos: Vector3
 	var back_teammate_pos: Vector3
 	var hit_angle: float
+	var front_col_shape: CollisionShape3D = front_serving_zone.get_node("CollisionShape3D")
+	var shape_size_x = front_col_shape.shape.get_size().x
 	if is_even_point_turn:
+		front_serving_zone.position = front_serving_zone_initial_pos
+		back_serving_zone.position = back_serving_zone_initial_pos
 		front_server_pos = front_server_marker.position
 		front_teammate_pos = front_teammate_marker.position
 		back_server_pos = back_server_marker.position
 		back_teammate_pos = back_teammate_marker.position
 		hit_angle = PI / 8
 	else: # odd points
+		front_serving_zone.position = front_serving_zone_initial_pos - Vector3(shape_size_x, 0, 0)
+		back_serving_zone.position = back_serving_zone_initial_pos + Vector3(shape_size_x, 0, 0)
 		front_server_pos = front_server_marker.position + 2 * Vector3.LEFT * front_server_marker.position.x
 		front_teammate_pos = front_teammate_marker.position + 2 * Vector3.RIGHT * front_teammate_marker.position.x
 		back_server_pos = back_server_marker.position - 2 * Vector3.RIGHT * back_server_marker.position.x
@@ -71,9 +79,7 @@ func get_serving_positions(current_points_sum: int) -> Array[Dictionary]:
 	# 	self.add_child(debug_marker)
 	return zones
 
-func ball_hit_serving_zone(ball_pos: Vector3, current_points_sum: int) -> bool:
-	var is_even_point_turn: bool = true if current_points_sum % 2 == 0 else false
-
+func ball_hit_serving_zone(ball_pos: Vector3, _current_points_sum: int) -> bool:
 	var front_col_shape: CollisionShape3D = front_serving_zone.get_node("CollisionShape3D")
 	var shape_size_x = front_col_shape.shape.get_size().x
 	var shape_size_z = front_col_shape.shape.get_size().z
@@ -88,17 +94,14 @@ func ball_hit_serving_zone(ball_pos: Vector3, current_points_sum: int) -> bool:
 	var back_z_min = back_serving_zone.position.z - shape_size_z / 2
 	var back_z_max = back_serving_zone.position.z + shape_size_z / 2
 
-	if is_even_point_turn:
-		# EL PROBLEMA ES QUE NO FUNCA EL X < Y < Z, DEBE SER X < Y AND Y < Z
-		var is_in_front: bool = front_x_min <= ball_pos.x <= front_x_max and front_z_min <= ball_pos.z <= front_z_max
-		var is_in_back: bool = back_x_min <= ball_pos.x <= back_x_max and back_z_min <= ball_pos.z <= back_z_max
-		print("Is in service box: ", is_in_front or is_in_back)
-		return is_in_front or is_in_back
-	else: # odd points
-		var is_in_front: bool = front_x_min - shape_size_x <= ball_pos.x <= front_x_max - shape_size_x and front_z_min <= ball_pos.z <= front_z_max
-		var is_in_back: bool = back_x_min + shape_size_x <= ball_pos.x <= back_x_max + shape_size_x and back_z_min <= ball_pos.z <= back_z_max
-		print("Is in service box: ", is_in_front or is_in_back)
-		return is_in_front or is_in_back
+	var in_front_x = front_x_min <= ball_pos.x and ball_pos.x <= front_x_max
+	var in_front_z = front_z_min <= ball_pos.z and ball_pos.z <= front_z_max
+	var in_back_x = back_x_min <= ball_pos.x and ball_pos.x <= back_x_max
+	var in_back_z = back_z_min <= ball_pos.z and ball_pos.z <= back_z_max
+	var is_in_front: bool = in_front_x and in_front_z
+	var is_in_back: bool = in_back_x and in_back_z
+	print("Is in service box: ", is_in_front or is_in_back)
+	return is_in_front or is_in_back
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -107,6 +110,9 @@ func _ready():
 	ground_front_side.body_entered.connect(_on_front_side_body_entered)
 	var ground_back_side: Area3D = ground.get_node("./BackSideArea3D")
 	ground_back_side.body_entered.connect(_on_back_side_body_entered)
+
+	front_serving_zone_initial_pos = front_serving_zone.position
+	back_serving_zone_initial_pos = back_serving_zone.position
 
 func _on_front_side_body_entered(node: Node3D):
 	if is_instance_of(node, Ball):

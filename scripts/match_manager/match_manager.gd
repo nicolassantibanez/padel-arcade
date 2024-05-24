@@ -191,23 +191,25 @@ func last_game_point_played(winning_team: TeamManager, losing_team: TeamManager)
 ## Passes the turn to the next Team
 func _end_current_team_turn():
 	last_turn_index = current_turn_index
-	current_turn_index = (current_turn_index + 1) % 2
-	# current_turn_index = -1
+	# current_turn_index = (current_turn_index + 1) % 2
+	current_turn_index = -1
 
 func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
 	ball_in_hitter_side = true
+	print("(hitmoment) hitter_side? ", ball_in_hitter_side)
 	is_serving = false
 	_end_current_team_turn()
-	create_new_ball(ball_hit.global_position, false, hit_direction, hit_angle)
-	ball_hit.queue_free()
-	# redirect_ball(hit_direction, hit_angle, ball_hit)
+	# create_new_ball(ball_hit.global_position, false, hit_direction, hit_angle)
+	# ball_hit.queue_free()
+	redirect_ball(hit_direction, hit_angle, ball_hit)
 
 func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
-	_end_current_team_turn()
+	# _end_current_team_turn()
+	ball.reset_bounce_count()
 	ball.is_serve_ball = false
 	ball.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle)
 	ball.target_velocity = ball.direction * ball.speed
-	# _connect_to_ball_signals(current_ball)
+	_connect_to_ball_signals(current_ball)
 
 ## Callback function when the serving team plays it's service
 ## 
@@ -224,7 +226,7 @@ func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector
 ## returns the new ball instance
 func create_new_ball(ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_angle: float) -> Ball:
 	var ball_instance: Node = ball_scene.instantiate()
-	ball_instance.position = ball_pos + Vector3.FORWARD
+	ball_instance.position = ball_pos + Vector3(0, 0, hit_direction)
 	ball_instance.is_serve_ball = is_serve
 	current_ball = ball_instance
 	ball_instance.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle)
@@ -262,11 +264,13 @@ func _on_ball_ground_bounce(ball: Ball):
 		call_fault(ball, FaultType.OUT)
 		return
 	if ball.floor_bounce_count == 2:
-		call_fault(ball, FaultType.OUT)
+		call_fault(ball, FaultType.DOUBLE_BOUNCE)
 
 func _on_ball_wall_bounce(ball: Ball):
+	print("Bounce count: ", ball.bounces_count)
+	print("Ball in hitter side: ", ball_in_hitter_side)
 	if ball.bounces_count == 1:
-		if current_turn_index != - 1: # Pelota cruzó, y ya golpeó el último turno
+		if not ball_in_hitter_side: # Pelota cruzó, y ya golpeó el último turno
 			call_fault(ball, FaultType.OUT)
 
 func _on_ball_fence_bounce(ball: Ball):
@@ -279,12 +283,15 @@ func _on_ball_net_bounce(ball: Ball):
 			hit_net_on_service = true
 
 func _on_ball_cross_side():
+	print("BALLL CROSSED SIDE!!!!!")
 	ball_in_hitter_side = false
+	current_turn_index = next_team_index(last_turn_index)
+	# start receiver turn
 
 func call_fault(ball: Ball, fault: FaultType):
 	print("FAULT!")
 	ball.disable_detector()
-	if is_serving:
+	if is_serving and fault != FaultType.DOUBLE_BOUNCE:
 		print("INVALID SERVE!")
 		if is_second_service:
 			is_second_service = false

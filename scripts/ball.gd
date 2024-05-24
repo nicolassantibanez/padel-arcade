@@ -20,23 +20,27 @@ var floor_bounce_count = 0
 
 var signals_enabled = true
 # var speed = 15
-var speed = 16
+var speed = 14
 var target_velocity: Vector3 = Vector3.ZERO
 var is_serve_ball: bool = false
 var first_bounce_was_net: bool = false
-var is_serving_side: bool = true
 var current_side: CourtSection.SECTION_TYPE
+
+func reset_bounce_count():
+	bounces_count = 0
+	floor_bounce_count = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	target_velocity = direction * speed
+	print("Initial Ball velocity: ", target_velocity)
 
 func _process(_delta):
 	if ray_cast.is_colliding():
 		var collider = ray_cast.get_collider()
 		if is_instance_of(collider, CourtSection) and current_side != collider.section_type:
+			print("Side: ", collider.name)
 			current_side = collider.section_type
-			is_serving_side = not is_serving_side
 			cross_side.emit()
 
 func _physics_process(delta):
