@@ -72,6 +72,7 @@ func manage_court_sections_collisions(section: CourtSection):
 	elif section.section_type == CourtSection.SECTION_TYPE.FENCE:
 		fence_bounce.emit(self)
 	elif section.section_type == CourtSection.SECTION_TYPE.NET:
+		bounces_count -= 1
 		print("NET BOUNCE!")
 		net_bounce.emit(self)
 	elif section.section_type == CourtSection.SECTION_TYPE.GROUND:

@@ -243,17 +243,17 @@ func _connect_to_ball_signals(ball: Ball):
 
 func _on_ball_ground_bounce(ball: Ball):
 	if is_serving:
-		print("BAll is serrving!!")
+		print("Ball is serrving!!")
 		if ball_in_hitter_side: # cayó en el mismo lado
 			print("Cayó en el mismo lado :cccc")
 			call_fault(ball, FaultType.OUT)
 			return
 		else: # cayó en lado correcto
-			if ball.bounces_count == 1 and not court.ball_hit_serving_zone(ball.global_position, get_total_played_points()):
+			if ball.bounces_count == 1 and not court.ball_hit_serving_zone(ball.global_position):
 				print("FUERA DEL SERVICE BOX")
 				call_fault(ball, FaultType.OUT)
 				return
-			elif ball.bounces_count >= 2 and hit_net_on_service:
+			elif ball.bounces_count >= 1 and hit_net_on_service:
 				hit_net_on_service = false
 				print("NET! Repeat Service")
 				go_to_second_service() # repeat service
@@ -277,10 +277,9 @@ func _on_ball_fence_bounce(ball: Ball):
 	if ball.bounces_count == 1: # No importa si la pelota cruza o no, siempre el primero choque con reja es falta
 		call_fault(ball, FaultType.OUT)
 
-func _on_ball_net_bounce(ball: Ball):
+func _on_ball_net_bounce(_ball: Ball):
 	if is_serving:
-		if ball.bounces_count == 1:
-			hit_net_on_service = true
+		hit_net_on_service = true
 
 func _on_ball_cross_side():
 	print("BALLL CROSSED SIDE!!!!!")
@@ -308,15 +307,3 @@ func call_fault(ball: Ball, fault: FaultType):
 				go_to_point_ended(teams[last_turn_index], teams[next_team_index(last_turn_index)])
 
 	ball.queue_free()
-
-func _deprecated_copy_ball_on_hit(ball: Ball, direction: int, angle_rotation: float):
-		var ball_instance: Node = ball_scene.instantiate()
-		ball_instance.position = ball.global_position + Vector3.FORWARD
-		# _add_debug_marker(body.global_position)
-		# ball_instance.position = body.position + Vector3.UP * 5
-		ball.queue_free()
-		ball = ball_instance
-		# var rand_angle = randf() * PI / 4
-		# ball_instance.direction = Vector3(0, 0.3, -1).rotated(Vector3.UP, rand_angle - PI / 8)
-		ball_instance.direction = Vector3(0, 0.3, direction).rotated(Vector3.UP, angle_rotation)
-		get_parent().add_child(ball_instance)

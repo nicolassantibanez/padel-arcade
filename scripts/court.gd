@@ -79,7 +79,7 @@ func get_serving_positions(current_points_sum: int) -> Array[Dictionary]:
 	# 	self.add_child(debug_marker)
 	return zones
 
-func ball_hit_serving_zone(ball_pos: Vector3, _current_points_sum: int) -> bool:
+func ball_hit_serving_zone(ball_pos: Vector3) -> bool:
 	var front_col_shape: CollisionShape3D = front_serving_zone.get_node("CollisionShape3D")
 	var shape_size_x = front_col_shape.shape.get_size().x
 	var shape_size_z = front_col_shape.shape.get_size().z
