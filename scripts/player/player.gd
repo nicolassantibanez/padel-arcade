@@ -8,9 +8,11 @@ enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
 
 @export var player_id: int = 1
 # How fast the player moves in meters per second
+@export var default_speed: float = 7
 @export var speed: float = 7
 # Downward acceleration
 @export var fall_acceleration: float = 75
+@export var active_ability: AbilityComponent
 
 @onready var early_hit_zone: Area3D = $OuterHitZone
 @onready var late_hit_zone: Area3D = $LateHitZone
@@ -116,6 +118,8 @@ func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 		get_parent().add_child(ball_instance)
 
 func free_input():
+	if Input.is_action_just_pressed("activate_skill_" + str(player_id)) and active_ability:
+		active_ability.activate()
 	if Input.is_action_just_pressed("hit_ball_" + str(player_id)):
 		if ball_in_inner_zone:
 			var hit_angle = 0
@@ -146,11 +150,11 @@ func normal_movement(delta):
 		direction.z += 1
 	if Input.is_action_pressed("move_forward_" + str(player_id)):
 		direction.z -= 1
-
+	
 	if direction != Vector3.ZERO: # Si nos estamos moviendo
 		direction = direction.normalized()
 		animation_player.play("Walk")
-		# Setting the basis property will affect the rotation of the node.
+		
 		pivot.basis = Basis.looking_at(direction)
 	else: # No moving
 		animation_player.play("Idle")

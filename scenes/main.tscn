@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dyd5s7js1uyid" path="res://scenes/court.tscn" id="2_ycrtk"]
 [ext_resource type="PackedScene" uid="uid://baw65g2x3vcnq" path="res://scenes/team_manager.tscn" id="3_3vumr"]
 [ext_resource type="PackedScene" uid="uid://dlcvuqascij4u" path="res://scenes/sainti.tscn" id="3_ll6s8"]
-[ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://scenes/ray.tscn" id="4_x6w7s"]
+[ext_resource type="PackedScene" uid="uid://bxjkarins58op" path="res://scenes/arai.tscn" id="4_x6w7s"]
 
 [sub_resource type="Animation" id="Animation_ds2fo"]
 length = 0.001
