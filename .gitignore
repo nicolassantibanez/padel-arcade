@@ -5,6 +5,9 @@
 # MacOs
 .DS_Store
 
+# Python
+venv
+
 # Godot 4+ specific ignores
 .godot/
 

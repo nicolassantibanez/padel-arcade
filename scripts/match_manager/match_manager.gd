@@ -77,6 +77,7 @@ func _ready():
 	for team in teams:
 		# Team's signals connections
 		team.ball_hit.connect(_on_team_ball_hit)
+		team.ball_hit_power.connect(_on_team_ball_hit_power)
 		team.service_hit.connect(_on_team_service_hit)
 		# Connect own signals to Teams
 		self.point_ended.connect(team._on_point_ended)
@@ -194,6 +195,17 @@ func _end_current_team_turn():
 	# current_turn_index = (current_turn_index + 1) % 2
 	current_turn_index = -1
 
+func _on_team_ball_hit_power(hit_direction: int, hit_angle: float, ball_hit: Ball, power: float):
+	ball_in_hitter_side = true
+	print("(hitmoment) hitter_side? ", ball_in_hitter_side)
+	is_serving = false
+	_end_current_team_turn()
+	# create_new_ball(ball_hit.global_position, false, hit_direction, hit_angle)
+	# ball_hit.queue_free()
+	# redirect_ball(hit_direction, hit_angle, ball_hit)
+	ball_hit.redirect(hit_direction, hit_angle, power)
+	# _connect_to_ball_signals(current_ball)
+
 func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
 	ball_in_hitter_side = true
 	print("(hitmoment) hitter_side? ", ball_in_hitter_side)
@@ -202,6 +214,8 @@ func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
 	# create_new_ball(ball_hit.global_position, false, hit_direction, hit_angle)
 	# ball_hit.queue_free()
 	redirect_ball(hit_direction, hit_angle, ball_hit)
+	# ball_hit.redirect(hit_direction, hit_angle, )
+	# _connect_to_ball_signals(current_ball)
 
 func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
 	# _end_current_team_turn()

@@ -3,6 +3,7 @@ class_name TeamManager
 extends Node3D
 
 signal ball_hit(hit_direction: int, hit_angle: float, ball: Ball)
+signal ball_hit_power(id: int, hit_angle: float, ball: Ball, power: float)
 signal service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3)
 
 var points: int = 0
@@ -74,6 +75,7 @@ func _ready():
 	# Connect player's signals
 	for p in players:
 		p.ball_hit.connect(_on_player_ball_hit)
+		p.ball_hit_power.connect(_on_player_ball_hit_power)
 		p.service_hit.connect(_on_player_service_hit)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -85,6 +87,10 @@ func _load_players() -> Array[Player]:
 		if is_instance_of(child, Player):
 			players.append(child)
 	return players
+
+func _on_player_ball_hit_power(_player_id: int, hit_angle: float, ball: Ball, power: float):
+	ball_hit_power.emit(hit_direction, hit_angle, ball)
+	# _deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
 
 func _on_player_ball_hit(_player_id: int, hit_angle: float, ball: Ball):
 	ball_hit.emit(hit_direction, hit_angle, ball)

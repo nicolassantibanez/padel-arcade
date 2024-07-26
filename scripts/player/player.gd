@@ -2,6 +2,7 @@ class_name Player
 extends CharacterBody3D
 
 signal ball_hit(id: int, hit_angle: float, ball: Ball)
+signal ball_hit_power(id: int, hit_angle: float, ball: Ball, power: float)
 signal service_hit(player: Player)
 
 enum hitType {EARLY_HIT, LATE_HIT, PERFECT_HIT}
@@ -32,6 +33,7 @@ var ball_to_hit: Ball = null
 var last_hit_status: String = ""
 var animation_player: AnimationPlayer = null
 var playing_ball: Ball
+var shot_started: int
 
 var _state: PlayerState
 
@@ -118,6 +120,28 @@ func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 		get_parent().add_child(ball_instance)
 
 func free_input():
+	if Input.is_action_just_pressed("activate_skill_" + str(player_id)) and active_ability:
+		active_ability.activate()
+	if Input.is_action_just_pressed("hit_ball_" + str(player_id)):
+		shot_started = Time.get_ticks_msec()
+	elif Input.is_action_just_released("hit_ball_" + str(player_id))
+		var pressed_seconds: float = (Time.get_ticks_msec() - shot_started) / 1000.0
+		if ball_in_inner_zone:
+			var hit_angle = 0
+			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, pressed_seconds)
+			print("PERFECT SHOT!")
+		elif ball_in_late_zone: # Early shot -> to the left
+			var hit_angle = randf() * (-PI / 4)
+			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, pressed_seconds)
+			print("TOO LATE!")
+		elif ball_in_early_zone: # Early shot -> to the right
+			var hit_angle = randf() * PI / 4
+			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, pressed_seconds)
+			print("TOO EARLY!")
+		else:
+			print("TOO EARLY!")
+
+func old_free_input():
 	if Input.is_action_just_pressed("activate_skill_" + str(player_id)) and active_ability:
 		active_ability.activate()
 	if Input.is_action_just_pressed("hit_ball_" + str(player_id)):
