@@ -61,7 +61,7 @@ collision_mask = 2
 [node name="CollisionShape3D" type="CollisionShape3D" parent="InnerHitZone"]
 shape = SubResource("SphereShape3D_pxuhf")
 
-[node name="DashComponent" parent="." node_paths=PackedStringArray("player_owner") instance=ExtResource("5_mdg1y")]
-player_owner = NodePath("..")
+[node name="DashComponent" parent="." instance=ExtResource("5_mdg1y")]
 max_uses = 2
 uses = 2
+player_owner = null

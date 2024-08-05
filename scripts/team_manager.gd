@@ -3,7 +3,7 @@ class_name TeamManager
 extends Node3D
 
 signal ball_hit(hit_direction: int, hit_angle: float, ball: Ball)
-signal ball_hit_power(id: int, hit_angle: float, ball: Ball, power: float)
+signal ball_hit_power(hit_angle: float, ball: Ball, power: float)
 signal service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3)
 
 var points: int = 0
@@ -16,11 +16,14 @@ var is_team_serving: bool = false
 var hit_direction: int
 var service_hit_angle: float
 
+
 func add_point():
 	points += 1
 
+
 func lose_point():
 	points -= 1
+
 
 func change_to_serve_state(turn_to_serve: bool, serving_zone: Dictionary):
 	print("IN team: ", self, "change_to_serve_state")
@@ -31,14 +34,15 @@ func change_to_serve_state(turn_to_serve: bool, serving_zone: Dictionary):
 		var player = players[i]
 		if is_team_serving:
 			if i == serving_player_index:
-				player.change_to_serve_state(serving_zone['server_pos'])
+				player.change_to_serve_state(serving_zone["server_pos"])
 			else:
-				player.change_to_wait_state(serving_zone['teammate_pos'])
+				player.change_to_wait_state(serving_zone["teammate_pos"])
 		else:
 			if i == serving_player_index:
-				player.change_to_receive_state(serving_zone['server_pos'])
+				player.change_to_receive_state(serving_zone["server_pos"])
 			else:
-				player.change_to_wait_state(serving_zone['teammate_pos'])
+				player.change_to_wait_state(serving_zone["teammate_pos"])
+
 
 func _on_point_ended(winning_team: TeamManager):
 	var won = false
@@ -47,27 +51,32 @@ func _on_point_ended(winning_team: TeamManager):
 	for p in players:
 		p.change_to_point_ended_state(won)
 
+
 func _on_game_ended():
 	pass
+
 
 func _on_set_ended():
 	pass
 
+
 func _on_serve_ended(new_ball: Ball):
 	for player in players:
 		player.change_to_play_state(new_ball)
+
 
 # Use setters to update the configuration warning automatically.
 func _get_configuration_warnings():
 	var warnings = []
 
 	players = _load_players()
-	
+
 	if players.size() == 0:
 		warnings.append("There must be at least one valid Player as child of this node")
 
 	# Returning an empty array means "no warning".
 	return warnings
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -78,9 +87,11 @@ func _ready():
 		p.ball_hit_power.connect(_on_player_ball_hit_power)
 		p.service_hit.connect(_on_player_service_hit)
 
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
 	pass
+
 
 func _load_players() -> Array[Player]:
 	for child in get_children():
@@ -88,18 +99,21 @@ func _load_players() -> Array[Player]:
 			players.append(child)
 	return players
 
+
 func _on_player_ball_hit_power(_player_id: int, hit_angle: float, ball: Ball, power: float):
-	ball_hit_power.emit(hit_direction, hit_angle, ball)
+	ball_hit_power.emit(hit_direction, hit_angle, ball, power)
 	# _deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
+
 
 func _on_player_ball_hit(_player_id: int, hit_angle: float, ball: Ball):
 	ball_hit.emit(hit_direction, hit_angle, ball)
 	# _deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
 
+
 func _on_player_service_hit(serving_player: Player):
 	# NEEDS:
-		# - Hit LEFT or RIGHT (depending court side and serving side)
-		# - HIT DIRECTION: should be a variable that should be updated by the match manager
+	# - Hit LEFT or RIGHT (depending court side and serving side)
+	# - HIT DIRECTION: should be a variable that should be updated by the match manager
 	if players[serving_player_index].player_id == serving_player.player_id:
 		var hit_angle = service_hit_angle
 		service_hit.emit(hit_direction, hit_angle, serving_player.global_position + Vector3.UP)

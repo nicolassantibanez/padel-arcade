@@ -8,12 +8,13 @@ signal fence_bounce(ball: Ball)
 signal net_bounce(ball: Ball)
 
 @onready var ray_cast: RayCast3D = $RayCast3D
-@onready var to_wall_ray_cast: RayCast3D = $ToWallRayCast3D
+@onready var debug_overlay: DebugOverlay = $DebugOverlay
 
 var direction = Vector3.ZERO
 
 @export var MAX_SPEED = 300
 @export var fall_acc = 10
+@export var show_gizmos: bool = false
 
 var air_acc: float = 3
 var bounces_count = 0
@@ -26,7 +27,6 @@ var target_velocity: Vector3 = Vector3.ZERO
 var is_serve_ball: bool = false
 var first_bounce_was_net: bool = false
 var current_side: CourtSection.SECTION_TYPE
-var distance_to_wall: Vector3
 
 
 func reset_bounce_count():
@@ -47,10 +47,6 @@ func _process(_delta):
 			print("Side: ", collider.name)
 			current_side = collider.section_type
 			cross_side.emit()
-	if to_wall_ray_cast.is_colliding():
-		# var collider = ray_cast.get_collider()
-		var collision_point: Vector3 = to_wall_ray_cast.get_collision_point()
-		distance_to_wall = collision_point - position
 
 
 func _physics_process(delta):
@@ -76,11 +72,28 @@ func redirect(hit_direction: int, hit_angle: float, power: float):
 	self.is_serve_ball = false
 	self.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle)
 	var angle = self.direction.angle_to(Vector3.FORWARD.rotated(Vector3.UP, hit_angle))
-	self.target_velocity = self.direction * self.speed
+	var shot_speed = _get_redirect_speed(power, angle)
+	self.target_velocity = self.direction * shot_speed
+	print("TARGET VELOCITY: ", self.target_velocity)
+	# self.target_velocity = self.direction * self.speed
+
+
+func _distance_to_wall(shot_direction: Vector3) -> float:
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(position, 100 * shot_direction)
+	var result: Dictionary = space_state.intersect_ray(query)
+	if result.get("collider") == null:
+		print("NO COLLITION!!!!")
+		return 0
+	var hit_position: Vector3 = result["position"]
+	print("HIT POSITION: ", hit_position)
+	debug_overlay.draw.add_vector(self.position, hit_position, 1, 4, Color(0, 1, 0, 0.5))
+	# if show_gizmos:
+	return position.distance_to(hit_position)
 
 
 func _get_redirect_speed(power: float, angle: float) -> float:
-	# distance_to_wall = 5
+	# var distance_to_wall = 5
 	# X: xf = x0 + v0 * dt
 	# x0 + v0*cos(angulo)*t
 	# yf = y0
@@ -91,11 +104,17 @@ func _get_redirect_speed(power: float, angle: float) -> float:
 	# 	v0 = (xf - x0) / (cos(angulo) * t)
 	# t = 2
 	#  v0 = (2 * fall_acc) / sin(angulo)
-	const base = 4.6415
-	var percentage: float = (base ** power) / 100.0
+	var distance_to_wall = _distance_to_wall(self.direction - Vector3(0, self.direction.y, 0))
+	print("DISTANCE TO WALL: ", distance_to_wall)
+	# const base = 4.6415
+	const base = 100
+	var percentage: float = 0.50 + (base ** power) / 100.0
+	print("PERCENTAGE: ", percentage)
 	var dx = percentage * distance_to_wall
-	var t = 2
+	var t = 1
+	# var v0 = 150 * dx / (cos(angle) * t)
 	var v0 = dx / (cos(angle) * t)
+	print("SHOT SPEED: ", distance_to_wall)
 	return v0
 
 
