@@ -1,62 +1,92 @@
 class_name Player
 extends CharacterBody3D
+## This node represents the Player's Character.
+## It manages everything about the character's actions.
 
+# --- SIGNALS ---
 signal ball_hit(id: int, hit_angle: float, ball: Ball)
 signal ball_hit_power(id: int, hit_angle: float, ball: Ball, power: float)
+# Signal used to notify when player has served
 signal service_hit(player: Player)
 
+# --- ENUMS ---
+# Used to describe how the player hit the ball
 enum hitType { EARLY_HIT, LATE_HIT, PERFECT_HIT }
 
+# --- EXPORTS ---
+# ID used to identify the player from other players
 @export var player_id: int = 1
 # How fast the player moves in meters per second
 @export var default_speed: float = 7
+# Current player's speed
 @export var speed: float = 7
 # Downward acceleration
 @export var fall_acceleration: float = 75
+# TODO: WHAT is THIS FOR!
 @export var active_ability: AbilityComponent
 
+# --- ONREADY ---
 @onready var early_hit_zone: Area3D = $OuterHitZone
 @onready var late_hit_zone: Area3D = $LateHitZone
 @onready var inner_hit_zone: Area3D = $InnerHitZone
 @onready var pivot = $Pivot
 @onready var character_model = $Pivot/Model
 
+## Current player's velocity
 var target_velocity: Vector3 = Vector3.ZERO
-var ball_scene: Resource = preload("res://scenes/ball.tscn")
-var debug_marker_scene: Resource = preload("res://scenes/debug_marker.tscn")
 
+## Used to create a new ball on hit
+## @deprecated
+var ball_scene: Resource = preload("res://scenes/ball.tscn")
+
+## Used to check if the player can hit a ball
 var can_hit_ball: bool = false
+
+## Used to check if the ball is inside the early hit zone
 var ball_in_early_zone: bool = false
+
+## Used to check if the ball is inside the late hit zone
 var ball_in_late_zone: bool = false
+
+## Used to check if the ball is inside the inner/perfect hit zone
 var ball_in_inner_zone: bool = false
+
+## Used to know which ball has entered the hit zones
 var ball_to_hit: Ball = null
-var last_hit_status: String = ""
+
+## Used to get the animation player of character
+## FIX: Investigate if theres is a better way to handle this
 var animation_player: AnimationPlayer = null
-var playing_ball: Ball
+
+## Used to know when a player has started to charge a shot
 var shot_started: int
 
+## Player's current state
 var _state: PlayerState
 
 
-#
+## Changes the [Player] current state to [EndPointState]
 func change_to_point_ended_state(_won: bool):
 	# TODO: Poner animaciones de victoria o derrota
-	# Bloquear movimientos
 	_state = PlayerEndPointState.new()
 
 
+## Changes the [Player] current state to [WaitState]
 func change_to_wait_state(wait_position: Vector3):
 	_state = PlayerWaitState.new(self, wait_position)
 
 
+## Changes the [Player] current state to [ReceiveState]
 func change_to_receive_state(receive_position: Vector3):
 	_state = PlayerReceiveState.new(self, receive_position)
 
 
+## Changes the [Player] current state to [ServeState]
 func change_to_serve_state(serving_position: Vector3):
 	_state = PlayerServeState.new(self, serving_position)
 
 
+## Changes the [Player] current state to [PlayState]
 func change_to_play_state(new_ball: Ball):
 	_state = PlayerPlayState.new(self, new_ball)
 
@@ -77,57 +107,56 @@ func _ready():
 
 func _process(delta):
 	_state.handle_input(delta, self)
-	if Input.is_physical_key_pressed(KEY_M):
-		_add_debug_marker(position)
 
 
 func _physics_process(delta):
 	_state.update(delta, self)
 
 
+## Callback function for ball entering the early hit zone
 func _on_early_hit_zone_body_entered(body: Node3D):
 	if is_instance_of(body, Ball):
 		ball_to_hit = body
 		ball_in_early_zone = true
 
 
+## Callback function for ball exiting the early hit zone
 func _on_early_hit_zone_body_exited(body: Node3D):
 	if is_instance_of(body, Ball):
 		ball_in_early_zone = false
 
 
+## Callback function for ball entering the late hit zone
 func _on_late_hit_zone_body_entered(body: Node3D):
 	if is_instance_of(body, Ball):
 		ball_to_hit = body
 		ball_in_late_zone = true
 
 
+## Callback function for ball exiting the late hit zone
 func _on_late_hit_zone_body_exited(body: Node3D):
 	if is_instance_of(body, Ball):
 		ball_in_late_zone = false
 
 
+## Callback function for ball entering the inner/perfect hit zone
 func _on_inner_hit_zone_body_entered(body: Node3D):
 	if is_instance_of(body, Ball):
 		ball_in_inner_zone = true
 		ball_to_hit = body
 
 
+## Callback function for ball exiting the inner/perfect hit zone
 func _on_inner_hit_zone_body_exited(body: Node3D):
 	if is_instance_of(body, Ball):
 		ball_in_inner_zone = false
 
 
-func _add_debug_marker(pos: Vector3):
-	var debug_marker: Node = debug_marker_scene.instantiate()
-	debug_marker.position = pos
-	get_parent().add_child(debug_marker)
-
-
+## Used when [Player] hits a ball. It creates a new one and destroys the one it hit
+## @deprecated
 func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 	var ball_instance: Node = ball_scene.instantiate()
 	ball_instance.position = body.global_position + Vector3.FORWARD
-	# _add_debug_marker(body.global_position)
 	# ball_instance.position = body.position + Vector3.UP * 5
 	body.queue_free()
 	# var rand_angle = randf() * PI / 4
@@ -136,6 +165,8 @@ func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 	get_parent().add_child(ball_instance)
 
 
+## Manages input a [Player] executes inside a _process function
+## Includes hitting ball and activating a skill.
 func free_input():
 	if Input.is_action_just_pressed("activate_skill_" + str(player_id)) and active_ability:
 		active_ability.activate()
@@ -159,6 +190,8 @@ func free_input():
 			print("TOO EARLY!")
 
 
+## Old way that the player's input was managed
+## @deprecated
 func old_free_input():
 	if Input.is_action_just_pressed("activate_skill_" + str(player_id)) and active_ability:
 		active_ability.activate()
@@ -179,8 +212,8 @@ func old_free_input():
 			print("TOO EARLY!")
 
 
-# Manages Player's free movement
-# ALRERT: Only use inside physics process
+## Manages input a [Player] executes inside a _physics_process function
+## It includes movement and animations
 func normal_movement(delta):
 	var direction = Vector3.ZERO
 
