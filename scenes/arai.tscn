@@ -18,6 +18,10 @@ radius = 1.105
 [node name="Ray" type="CharacterBody3D" node_paths=PackedStringArray("active_ability")]
 collision_layer = 4
 script = ExtResource("1_gffhl")
+player_id = null
+default_speed = null
+speed = null
+fall_acceleration = null
 active_ability = NodePath("DashComponent")
 
 [node name="Pivot" type="Node3D" parent="."]
@@ -64,4 +68,3 @@ shape = SubResource("SphereShape3D_pxuhf")
 [node name="DashComponent" parent="." instance=ExtResource("5_mdg1y")]
 max_uses = 2
 uses = 2
-player_owner = null

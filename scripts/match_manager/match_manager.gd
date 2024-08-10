@@ -91,7 +91,7 @@ func _ready():
 		serving_team_index = 1
 	for team in teams:
 		## Team's signals connections
-		team.ball_hit.connect(_on_team_ball_hit)
+		# team.ball_hit.connect(_on_team_ball_hit)
 		team.ball_hit_power.connect(_on_team_ball_hit_power)
 		team.service_hit.connect(_on_team_service_hit)
 		## Connect own signals to Teams

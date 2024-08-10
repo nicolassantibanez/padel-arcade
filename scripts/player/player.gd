@@ -65,6 +65,28 @@ var shot_started: int
 var _state: PlayerState
 
 
+func _ready():
+	_state = PlayerPlayState.new()
+	animation_player = character_model.get_node("./AnimationPlayer")
+
+	early_hit_zone.body_entered.connect(_on_early_hit_zone_body_entered)
+	early_hit_zone.body_exited.connect(_on_early_hit_zone_body_exited)
+
+	late_hit_zone.body_entered.connect(_on_late_hit_zone_body_entered)
+	late_hit_zone.body_exited.connect(_on_late_hit_zone_body_exited)
+
+	inner_hit_zone.body_entered.connect(_on_inner_hit_zone_body_entered)
+	inner_hit_zone.body_exited.connect(_on_inner_hit_zone_body_exited)
+
+
+func _process(delta):
+	_state.handle_input(delta, self)
+
+
+func _physics_process(delta):
+	_state.update(delta, self)
+
+
 ## Changes the [Player] current state to [EndPointState]
 func change_to_point_ended_state(_won: bool):
 	# TODO: Poner animaciones de victoria o derrota
@@ -88,29 +110,7 @@ func change_to_serve_state(serving_position: Vector3):
 
 ## Changes the [Player] current state to [PlayState]
 func change_to_play_state(new_ball: Ball):
-	_state = PlayerPlayState.new(self, new_ball)
-
-
-func _ready():
-	_state = PlayerPlayState.new(self, null)
-	animation_player = character_model.get_node("./AnimationPlayer")
-
-	early_hit_zone.body_entered.connect(_on_early_hit_zone_body_entered)
-	early_hit_zone.body_exited.connect(_on_early_hit_zone_body_exited)
-
-	late_hit_zone.body_entered.connect(_on_late_hit_zone_body_entered)
-	late_hit_zone.body_exited.connect(_on_late_hit_zone_body_exited)
-
-	inner_hit_zone.body_entered.connect(_on_inner_hit_zone_body_entered)
-	inner_hit_zone.body_exited.connect(_on_inner_hit_zone_body_exited)
-
-
-func _process(delta):
-	_state.handle_input(delta, self)
-
-
-func _physics_process(delta):
-	_state.update(delta, self)
+	_state = PlayerPlayState.new()
 
 
 ## Callback function for ball entering the early hit zone
