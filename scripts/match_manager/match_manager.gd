@@ -9,17 +9,11 @@ signal set_ended
 signal match_ended
 signal serve_ended(new_ball: Ball)
 
-const ball_scene: Resource = preload ("res://scenes/ball.tscn")
-const POINTS = {
-	0: 0,
-	1: 15,
-	2: 30,
-	3: 40,
-	4: "ADV"
-}
+const ball_scene: Resource = preload("res://scenes/ball.tscn")
+const POINTS = {0: 0, 1: 15, 2: 30, 3: 40, 4: "ADV"}
 
-enum FaultType {DOUBLE_BOUNCE, OUT}
-enum State {PAUSE, PLAY}
+enum FaultType { DOUBLE_BOUNCE, OUT }
+enum State { PAUSE, PLAY }
 
 var teams: Array[TeamManager] = []
 var score: Array[Dictionary] = [
@@ -51,6 +45,7 @@ var ball_in_hitter_side = true
 
 var balls_in_game = {}
 
+
 # Use setters to update the configuration warning automatically.
 func _get_configuration_warnings():
 	var warnings = []
@@ -58,12 +53,13 @@ func _get_configuration_warnings():
 	for co_node in get_parent().get_children():
 		if is_instance_of(co_node, UIManager):
 			ui_manager = co_node
-	
+
 	if not ui_manager:
 		warnings.append("UIManager is missing in the scene tree!")
 
 	# Returning an empty array means "no warning".
 	return warnings
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -80,10 +76,10 @@ func _ready():
 		team.ball_hit_power.connect(_on_team_ball_hit_power)
 		team.service_hit.connect(_on_team_service_hit)
 		# Connect own signals to Teams
-		self.point_ended.connect(team._on_point_ended)
-		self.game_ended.connect(team._on_game_ended)
-		self.set_ended.connect(team._on_set_ended)
-		self.serve_ended.connect(team._on_serve_ended)
+		self.point_ended.connect(team.on_point_ended)
+		self.game_ended.connect(team.on_game_ended)
+		self.set_ended.connect(team.on_set_ended)
+		self.serve_ended.connect(team.on_serve_ended)
 	# Connect UIManager's signals
 	update_points_ui.connect(ui_manager.on_update_points)
 	# Connect Court's signals
@@ -94,9 +90,11 @@ func _ready():
 	# Como lo puse como último nodo, espero a que esté listo para poder empezar
 	court.ready.connect(start_game)
 
+
 # Function that initiates the match/game
 func start_game():
 	_serve_setup()
+
 
 # Put players into positions for a new service
 func _serve_setup():
@@ -112,6 +110,7 @@ func _serve_setup():
 		else:
 			team.change_to_serve_state(false, serving_pos)
 
+
 func _load_dependencies():
 	for co_node in get_parent().get_children():
 		if is_instance_of(co_node, TeamManager):
@@ -122,6 +121,7 @@ func _load_dependencies():
 		elif is_instance_of(co_node, Court):
 			court = co_node
 
+
 ## Function that manages the logic when a point ends
 func go_to_point_ended(winning_team: TeamManager, losing_team: TeamManager):
 	print("POINT ENDED!")
@@ -131,29 +131,32 @@ func go_to_point_ended(winning_team: TeamManager, losing_team: TeamManager):
 	# TODO: POINT REPLAY
 
 	# 3. Check if is game point
-	if last_game_point_played(winning_team, losing_team): # END CURRENT GAME
+	if last_game_point_played(winning_team, losing_team):  # END CURRENT GAME
 		go_to_game_ended()
-	else: # Continue current GAME
-		if losing_team.points == 4: # If losing team with ADV
+	else:  # Continue current GAME
+		if losing_team.points == 4:  # If losing team with ADV
 			losing_team.lose_point()
-		else: # Add point to winning team
+		else:  # Add point to winning team
 			winning_team.add_point()
 		_update_points()
-		_serve_setup() # Notify Players to switch to serve state
+		_serve_setup()  # Notify Players to switch to serve state
+
 
 func go_to_second_service():
 	_serve_setup()
 
+
 func _update_points():
 	for i in range(len(teams)):
-		score[i]['points'] = teams[i].points
+		score[i]["points"] = teams[i].points
 	update_points_ui.emit(score)
+
 
 ## Manages the logic when a GAME ends
 func go_to_game_ended():
 	# Agregar game point al equipo que lo ganó
 	var winner_index: int = get_team_index_game_winner()
-	score[winner_index]['games'] += 1
+	score[winner_index]["games"] += 1
 	# Reset current game points
 	for team in teams:
 		team.points = 0
@@ -165,8 +168,10 @@ func go_to_game_ended():
 	serving_team = teams[serving_team_index]
 	_serve_setup()
 
+
 func next_team_index(current_index: int) -> int:
 	return (current_index + 1) % 2
+
 
 func get_team_index_game_winner() -> int:
 	var winner_index: int = 0
@@ -178,16 +183,19 @@ func get_team_index_game_winner() -> int:
 			p = team.points
 	return winner_index
 
+
 func get_total_played_points() -> int:
 	var total: int = 0
 	for team in teams:
 		total = total + team.points
 	return total
 
+
 func last_game_point_played(winning_team: TeamManager, losing_team: TeamManager) -> bool:
 	if winning_team.points == 4 or (winning_team.points == 3 and losing_team.points < 3):
 		return true
 	return false
+
 
 ## Passes the turn to the next Team
 func _end_current_team_turn():
@@ -195,7 +203,9 @@ func _end_current_team_turn():
 	# current_turn_index = (current_turn_index + 1) % 2
 	current_turn_index = -1
 
+
 func _on_team_ball_hit_power(hit_direction: int, hit_angle: float, ball_hit: Ball, power: float):
+	# TODO: Check if is this Team Turn to hit the ball!!! If not -> ignore it
 	ball_in_hitter_side = true
 	print("(hitmoment) hitter_side? ", ball_in_hitter_side)
 	is_serving = false
@@ -206,7 +216,9 @@ func _on_team_ball_hit_power(hit_direction: int, hit_angle: float, ball_hit: Bal
 	ball_hit.redirect(hit_direction, hit_angle, power)
 	# _connect_to_ball_signals(current_ball)
 
+
 func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
+	# TODO: Check if is this Team Turn to hit the ball!!! If not -> ignore it
 	ball_in_hitter_side = true
 	print("(hitmoment) hitter_side? ", ball_in_hitter_side)
 	is_serving = false
@@ -217,6 +229,7 @@ func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
 	# ball_hit.redirect(hit_direction, hit_angle, )
 	# _connect_to_ball_signals(current_ball)
 
+
 func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
 	# _end_current_team_turn()
 	ball.reset_bounce_count()
@@ -225,8 +238,9 @@ func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
 	ball.target_velocity = ball.direction * ball.speed
 	_connect_to_ball_signals(current_ball)
 
+
 ## Callback function when the serving team plays it's service
-## 
+##
 ## - Create new serve Ball
 ## - Notify every team that the service has been played
 func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3):
@@ -236,9 +250,12 @@ func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector
 	var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle)
 	serve_ended.emit(new_ball)
 
+
 ## Creates a new ball for the match
 ## returns the new ball instance
-func create_new_ball(ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_angle: float) -> Ball:
+func create_new_ball(
+	ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_angle: float
+) -> Ball:
 	var ball_instance: Node = ball_scene.instantiate()
 	ball_instance.position = ball_pos + Vector3(0, 0, hit_direction)
 	ball_instance.is_serve_ball = is_serve
@@ -248,6 +265,7 @@ func create_new_ball(ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_
 	_connect_to_ball_signals(current_ball)
 	return ball_instance
 
+
 func _connect_to_ball_signals(ball: Ball):
 	ball.ground_bounce.connect(_on_ball_ground_bounce)
 	ball.wall_bounce.connect(_on_ball_wall_bounce)
@@ -255,14 +273,15 @@ func _connect_to_ball_signals(ball: Ball):
 	ball.net_bounce.connect(_on_ball_net_bounce)
 	ball.cross_side.connect(_on_ball_cross_side)
 
+
 func _on_ball_ground_bounce(ball: Ball):
 	if is_serving:
 		print("Ball is serrving!!")
-		if ball_in_hitter_side: # cayó en el mismo lado
+		if ball_in_hitter_side:  # cayó en el mismo lado
 			print("Cayó en el mismo lado :cccc")
 			call_fault(ball, FaultType.OUT)
 			return
-		else: # cayó en lado correcto
+		else:  # cayó en lado correcto
 			if ball.bounces_count == 1 and not court.ball_hit_serving_zone(ball.global_position):
 				print("FUERA DEL SERVICE BOX")
 				call_fault(ball, FaultType.OUT)
@@ -270,7 +289,7 @@ func _on_ball_ground_bounce(ball: Ball):
 			elif ball.bounces_count >= 1 and hit_net_on_service:
 				hit_net_on_service = false
 				print("NET! Repeat Service")
-				go_to_second_service() # repeat service
+				go_to_second_service()  # repeat service
 				return
 	print("Floor bounce count: ", ball.floor_bounce_count)
 	if ball_in_hitter_side:
@@ -280,26 +299,31 @@ func _on_ball_ground_bounce(ball: Ball):
 	if ball.floor_bounce_count == 2:
 		call_fault(ball, FaultType.DOUBLE_BOUNCE)
 
+
 func _on_ball_wall_bounce(ball: Ball):
 	print("Bounce count: ", ball.bounces_count)
 	print("Ball in hitter side: ", ball_in_hitter_side)
 	if ball.bounces_count == 1:
-		if not ball_in_hitter_side: # Pelota cruzó, y ya golpeó el último turno
+		if not ball_in_hitter_side:  # Pelota cruzó, y ya golpeó el último turno
 			call_fault(ball, FaultType.OUT)
 
+
 func _on_ball_fence_bounce(ball: Ball):
-	if ball.bounces_count == 1: # No importa si la pelota cruza o no, siempre el primero choque con reja es falta
+	if ball.bounces_count == 1:  # No importa si la pelota cruza o no, siempre el primero choque con reja es falta
 		call_fault(ball, FaultType.OUT)
+
 
 func _on_ball_net_bounce(_ball: Ball):
 	if is_serving:
 		hit_net_on_service = true
+
 
 func _on_ball_cross_side():
 	print("BALLL CROSSED SIDE!!!!!")
 	ball_in_hitter_side = false
 	current_turn_index = next_team_index(last_turn_index)
 	# start receiver turn
+
 
 func call_fault(ball: Ball, fault: FaultType):
 	print("FAULT!")
