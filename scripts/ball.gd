@@ -1,5 +1,6 @@
 extends CharacterBody3D
 class_name Ball
+## Node that represents a Ball
 
 signal cross_side
 signal ground_bounce(ball: Ball)
@@ -10,20 +11,21 @@ signal net_bounce(ball: Ball)
 @onready var ray_cast: RayCast3D = $RayCast3D
 @onready var debug_overlay: DebugOverlay = $DebugOverlay
 
-var direction = Vector3.ZERO
-
 @export var MAX_SPEED = 300
 @export var fall_acc = 10
 @export var show_gizmos: bool = false
 
+## How much air deaccelerates the ball
 var air_acc: float = 3
+## Counts current ball bounces
 var bounces_count = 0
+## Counts current ball bounces on the ground
 var floor_bounce_count = 0
 
 var signals_enabled = true
-# var speed = 15
-var speed = 14
 var target_velocity: Vector3 = Vector3.ZERO
+var direction = Vector3.ZERO
+var speed = 14
 var is_serve_ball: bool = false
 var first_bounce_was_net: bool = false
 var current_side: CourtSection.SECTION_TYPE
@@ -70,7 +72,7 @@ func _physics_process(delta):
 func redirect(hit_direction: int, hit_angle: float, power: float):
 	self.reset_bounce_count()
 	self.is_serve_ball = false
-	self.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle)
+	self.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle).normalized()
 	var angle = self.direction.angle_to(Vector3.FORWARD.rotated(Vector3.UP, hit_angle))
 	var shot_speed = _get_redirect_speed(power, angle)
 	self.target_velocity = self.direction * shot_speed
@@ -104,17 +106,20 @@ func _get_redirect_speed(power: float, angle: float) -> float:
 	# 	v0 = (xf - x0) / (cos(angulo) * t)
 	# t = 2
 	#  v0 = (2 * fall_acc) / sin(angulo)
+
+	var shot_length = 9.0 + 8.0 * power
 	var distance_to_wall = _distance_to_wall(self.direction - Vector3(0, self.direction.y, 0))
 	print("DISTANCE TO WALL: ", distance_to_wall)
 	# const base = 4.6415
 	const base = 100
 	var percentage: float = 0.50 + (base ** power) / 100.0
-	print("PERCENTAGE: ", percentage)
+	# print("PERCENTAGE: ", percentage)
 	var dx = percentage * distance_to_wall
 	var t = 1
 	# var v0 = 150 * dx / (cos(angle) * t)
-	var v0 = dx / (cos(angle) * t)
-	print("SHOT SPEED: ", distance_to_wall)
+	# var v0 = dx / (cos(angle) * t)
+	var v0 = shot_length / (cos(angle) * t)
+	print("SHOT SPEED: ", v0)
 	return v0
 
 

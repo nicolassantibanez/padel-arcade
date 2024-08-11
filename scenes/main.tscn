@@ -58,19 +58,12 @@ shadow_enabled = true
 
 [node name="Player1" parent="TeamManager" instance=ExtResource("4_x6w7s")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 2.5241, 0.55033, 7.48056)
-player_id = null
-default_speed = null
-speed = null
-fall_acceleration = null
 
 [node name="TeamManager2" parent="." instance=ExtResource("3_3vumr")]
 
 [node name="Sainti" parent="TeamManager2" instance=ExtResource("3_ll6s8")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 2.26552, -3.57854)
 player_id = 2
-default_speed = null
-speed = null
-fall_acceleration = null
 
 [node name="CameraPivot" type="Marker3D" parent="."]
 transform = Transform3D(1, -5.95416e-16, 2.4663e-16, 4.16307e-16, 0.888921, 0.45806, -4.9197e-16, -0.45806, 0.888921, 0, 0, 0)

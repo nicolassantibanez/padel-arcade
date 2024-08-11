@@ -13,6 +13,9 @@ signal service_hit(player: Player)
 # Used to describe how the player hit the ball
 enum hitType { EARLY_HIT, LATE_HIT, PERFECT_HIT }
 
+# --- CONSTS ---
+const MAX_HIT_CHARGE: float = 1.0
+
 # --- EXPORTS ---
 # ID used to identify the player from other players
 @export var player_id: int = 1
@@ -165,6 +168,16 @@ func _deprecated_copy_ball_on_hit(body: Ball, angle_rotation: float):
 	get_parent().add_child(ball_instance)
 
 
+## Caculates the shot power, by the amount of time the player pressed the button
+func _get_shot_power(seconds_charged: float):
+	print("SECONDS_CHARGED:", seconds_charged)
+	var power_chunks = 1.0 / MAX_HIT_CHARGE
+	var power_x = power_chunks * min(MAX_HIT_CHARGE, seconds_charged)
+	var final_power = 1 - 2 ** (-10 * power_x)
+	print("POWER:", final_power)
+	return final_power
+
+
 ## Manages input a [Player] executes inside a _process function
 ## Includes hitting ball and activating a skill.
 func free_input():
@@ -176,15 +189,15 @@ func free_input():
 		var pressed_seconds: float = (Time.get_ticks_msec() - shot_started) / 1000.0
 		if ball_in_inner_zone:
 			var hit_angle = 0
-			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, pressed_seconds)
+			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, _get_shot_power(pressed_seconds))
 			print("PERFECT SHOT!")
 		elif ball_in_late_zone:  # Early shot -> to the left
 			var hit_angle = randf() * (-PI / 4)
-			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, pressed_seconds)
+			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, _get_shot_power(pressed_seconds))
 			print("TOO LATE!")
 		elif ball_in_early_zone:  # Early shot -> to the right
 			var hit_angle = randf() * PI / 4
-			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, pressed_seconds)
+			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, _get_shot_power(pressed_seconds))
 			print("TOO EARLY!")
 		else:
 			print("TOO EARLY!")
