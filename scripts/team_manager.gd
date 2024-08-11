@@ -9,6 +9,7 @@ extends Node3D
 signal ball_hit(hit_direction: int, hit_angle: float, ball: Ball)
 signal ball_hit_power(hit_angle: float, ball: Ball, power: float)
 signal service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3)
+signal turn_ended
 
 ## Keeps the count of their own current game points
 var points: int = 0
@@ -27,6 +28,9 @@ var hit_direction: int
 
 ## The current angle the serving [Player] has to serve to
 var service_hit_angle: float
+
+## Checks if the team can hit the ball
+var turn_to_hit: bool
 
 
 # Use setters to update the configuration warning automatically.
@@ -123,8 +127,15 @@ func _load_players() -> Array[Player]:
 
 
 ## Callback function when a [Player] hits a ball with power
-func _on_player_ball_hit_power(_player_id: int, hit_angle: float, ball: Ball, power: float):
-	ball_hit_power.emit(hit_direction, hit_angle, ball, power)
+func _on_player_ball_hit_power(
+	_player_id: int, ball: Ball, shot_speed: float, lift_angle: float, rotation_angle: float
+):
+	if not turn_to_hit:
+		return
+	turn_ended.emit()
+	var lifted_vector = Vector3(0, 0, self.hit_direction).rotated(Vector3.RIGHT, lift_angle)
+	var shot_direction = lifted_vector.rotated(Vector3.UP, rotation_angle).normalized()
+	ball.redirect(shot_direction, shot_speed)
 
 
 ## Callback function when a [Player] hits a ball

@@ -5,7 +5,8 @@ extends CharacterBody3D
 
 # --- SIGNALS ---
 signal ball_hit(id: int, hit_angle: float, ball: Ball)
-signal ball_hit_power(id: int, hit_angle: float, ball: Ball, power: float)
+## TODO: Describe signal
+signal ball_hit_power(id: int, ball: Ball, speed: float, lift_angle: float, rotation_angle: float)
 # Signal used to notify when player has served
 signal service_hit(player: Player)
 
@@ -178,6 +179,20 @@ func _get_shot_power(seconds_charged: float):
 	return final_power
 
 
+## Calculates the shot speed bases on the shot charge and lift angle
+func _get_shot_speed(seconds_charged: float, lift_angle: float):
+	var power = _get_shot_power(seconds_charged)
+	## If power is minimal -> the shot should travel at least 9.0 units
+	## If power is maximum -> the shot should travel at most 17.0 units
+	## FIX: The equations assume the ball is at ground level (which is not)
+	var shot_length = 6.0 + 8.0 * power
+	return sqrt(shot_length * 10 / sin(2 * lift_angle))
+	## Time Based speed (it is not working (dont) know why)
+	# Time to travel of the shot!
+	# var t = 5.0
+	# return shot_length / (cos(lift_angle) * t)
+
+
 ## Manages input a [Player] executes inside a _process function
 ## Includes hitting ball and activating a skill.
 func free_input():
@@ -187,17 +202,38 @@ func free_input():
 		shot_started = Time.get_ticks_msec()
 	elif Input.is_action_just_released("hit_ball_" + str(player_id)):
 		var pressed_seconds: float = (Time.get_ticks_msec() - shot_started) / 1000.0
+		## Angle the describes the elevation of the hit
+		var lift_angle = deg_to_rad(15)
 		if ball_in_inner_zone:
+			## Angle that describes how far to the left or right it hit the ball
 			var hit_angle = 0
-			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, _get_shot_power(pressed_seconds))
+			ball_hit_power.emit(
+				player_id,
+				ball_to_hit,
+				_get_shot_speed(pressed_seconds, lift_angle),
+				lift_angle,
+				hit_angle
+			)
 			print("PERFECT SHOT!")
 		elif ball_in_late_zone:  # Early shot -> to the left
 			var hit_angle = randf() * (-PI / 4)
-			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, _get_shot_power(pressed_seconds))
+			ball_hit_power.emit(
+				player_id,
+				ball_to_hit,
+				_get_shot_speed(pressed_seconds, lift_angle),
+				lift_angle,
+				hit_angle
+			)
 			print("TOO LATE!")
 		elif ball_in_early_zone:  # Early shot -> to the right
 			var hit_angle = randf() * PI / 4
-			ball_hit_power.emit(player_id, hit_angle, ball_to_hit, _get_shot_power(pressed_seconds))
+			ball_hit_power.emit(
+				player_id,
+				ball_to_hit,
+				_get_shot_speed(pressed_seconds, lift_angle),
+				lift_angle,
+				hit_angle
+			)
 			print("TOO EARLY!")
 		else:
 			print("TOO EARLY!")

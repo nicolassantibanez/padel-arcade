@@ -92,7 +92,7 @@ func _ready():
 	for team in teams:
 		## Team's signals connections
 		# team.ball_hit.connect(_on_team_ball_hit)
-		team.ball_hit_power.connect(_on_team_ball_hit_power)
+		team.turn_ended.connect(_on_team_turn_ended)
 		team.service_hit.connect(_on_team_service_hit)
 		## Connect own signals to Teams
 		self.point_ended.connect(team.on_point_ended)
@@ -225,23 +225,18 @@ func last_game_point_played(winning_team: TeamManager, losing_team: TeamManager)
 
 ## Passes the turn to the next Team
 func _end_current_team_turn():
+	##
+	teams[current_turn_index].turn_to_hit = false
 	last_turn_index = current_turn_index
-	# current_turn_index = (current_turn_index + 1) % 2
-	current_turn_index = -1
+	current_turn_index = (current_turn_index + 1) % 2
+	teams[current_turn_index].turn_to_hit = true
+	# current_turn_index = -1
 
 
-## Callback function when a [Team] hits a ball with power
-func _on_team_ball_hit_power(hit_direction: int, hit_angle: float, ball_hit: Ball, power: float):
-	# TODO: Check if is this Team Turn to hit the ball!!! If not -> ignore it
+func _on_team_turn_ended():
 	ball_in_hitter_side = true
-	print("(hitmoment) hitter_side? ", ball_in_hitter_side)
 	is_serving = false
 	_end_current_team_turn()
-	# create_new_ball(ball_hit.global_position, false, hit_direction, hit_angle)
-	# ball_hit.queue_free()
-	# redirect_ball(hit_direction, hit_angle, ball_hit)
-	ball_hit.redirect(hit_direction, hit_angle, power)
-	# _connect_to_ball_signals(current_ball)
 
 
 ## Callback function when a [Team] hits a ball

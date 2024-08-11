@@ -69,15 +69,22 @@ func _physics_process(delta):
 		move_and_collide(reflect * 0.95)
 
 
-func redirect(hit_direction: int, hit_angle: float, power: float):
+func redirect(shot_direction: Vector3, shot_speed: float):
 	self.reset_bounce_count()
 	self.is_serve_ball = false
-	self.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle).normalized()
-	var angle = self.direction.angle_to(Vector3.FORWARD.rotated(Vector3.UP, hit_angle))
-	var shot_speed = _get_redirect_speed(power, angle)
+	self.direction = shot_direction
 	self.target_velocity = self.direction * shot_speed
-	print("TARGET VELOCITY: ", self.target_velocity)
-	# self.target_velocity = self.direction * self.speed
+
+
+# func redirect(hit_direction: int, hit_angle: float, power: float):
+# 	self.reset_bounce_count()
+# 	self.is_serve_ball = false
+# 	self.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle).normalized()
+# 	var angle = self.direction.angle_to(Vector3.FORWARD.rotated(Vector3.UP, hit_angle))
+# 	var shot_speed = _get_redirect_speed(power, angle)
+# 	self.target_velocity = self.direction * shot_speed
+# 	print("TARGET VELOCITY: ", self.target_velocity)
+# 	# self.target_velocity = self.direction * self.speed
 
 
 func _distance_to_wall(shot_direction: Vector3) -> float:
