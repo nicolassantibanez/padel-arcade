@@ -69,6 +69,7 @@ func _physics_process(delta):
 		move_and_collide(reflect * 0.95)
 
 
+## Redirects the ball trayectory, based on a certain direction and initial speed
 func redirect(shot_direction: Vector3, shot_speed: float):
 	self.reset_bounce_count()
 	self.is_serve_ball = false
@@ -76,17 +77,7 @@ func redirect(shot_direction: Vector3, shot_speed: float):
 	self.target_velocity = self.direction * shot_speed
 
 
-# func redirect(hit_direction: int, hit_angle: float, power: float):
-# 	self.reset_bounce_count()
-# 	self.is_serve_ball = false
-# 	self.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle).normalized()
-# 	var angle = self.direction.angle_to(Vector3.FORWARD.rotated(Vector3.UP, hit_angle))
-# 	var shot_speed = _get_redirect_speed(power, angle)
-# 	self.target_velocity = self.direction * shot_speed
-# 	print("TARGET VELOCITY: ", self.target_velocity)
-# 	# self.target_velocity = self.direction * self.speed
-
-
+## @deprecated
 func _distance_to_wall(shot_direction: Vector3) -> float:
 	var space_state = get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(position, 100 * shot_direction)
@@ -101,6 +92,7 @@ func _distance_to_wall(shot_direction: Vector3) -> float:
 	return position.distance_to(hit_position)
 
 
+## @deprecated
 func _get_redirect_speed(power: float, angle: float) -> float:
 	# var distance_to_wall = 5
 	# X: xf = x0 + v0 * dt

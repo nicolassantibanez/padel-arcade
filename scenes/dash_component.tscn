@@ -4,11 +4,3 @@
 
 [node name="DashComponent" type="Node3D"]
 script = ExtResource("1_n4atg")
-
-[node name="Timer" type="Timer" parent="."]
-wait_time = 0.2
-one_shot = true
-
-[node name="CooldownTimer" type="Timer" parent="."]
-wait_time = 3.0
-one_shot = true

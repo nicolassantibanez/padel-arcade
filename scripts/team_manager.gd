@@ -133,7 +133,9 @@ func _on_player_ball_hit_power(
 	if not turn_to_hit:
 		return
 	turn_ended.emit()
-	var lifted_vector = Vector3(0, 0, self.hit_direction).rotated(Vector3.RIGHT, lift_angle)
+	var lifted_vector = Vector3(0, 0, self.hit_direction).rotated(
+		self.hit_direction * Vector3.LEFT, lift_angle
+	)
 	var shot_direction = lifted_vector.rotated(Vector3.UP, rotation_angle).normalized()
 	ball.redirect(shot_direction, shot_speed)
 

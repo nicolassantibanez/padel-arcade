@@ -15,10 +15,10 @@ radius = 2.4
 [sub_resource type="SphereShape3D" id="SphereShape3D_pxuhf"]
 radius = 1.105
 
-[node name="Ray" type="CharacterBody3D" node_paths=PackedStringArray("active_ability")]
+[node name="Ray" type="CharacterBody3D" node_paths=PackedStringArray("dash_component")]
 collision_layer = 4
 script = ExtResource("1_gffhl")
-active_ability = NodePath("DashComponent")
+dash_component = NodePath("DashComponent")
 
 [node name="Pivot" type="Node3D" parent="."]
 transform = Transform3D(1, -3.48787e-16, 3.48787e-16, 3.48787e-16, 1, -3.48787e-16, -3.48787e-16, 3.48787e-16, 1, 0, 1.2, 0)
@@ -61,6 +61,7 @@ collision_mask = 2
 [node name="CollisionShape3D" type="CollisionShape3D" parent="InnerHitZone"]
 shape = SubResource("SphereShape3D_pxuhf")
 
-[node name="DashComponent" parent="." instance=ExtResource("5_mdg1y")]
+[node name="DashComponent" parent="." node_paths=PackedStringArray("player_owner") instance=ExtResource("5_mdg1y")]
 max_uses = 2
 uses = 2
+player_owner = NodePath("..")

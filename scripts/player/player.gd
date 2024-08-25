@@ -16,6 +16,7 @@ enum hitType { EARLY_HIT, LATE_HIT, PERFECT_HIT }
 
 # --- CONSTS ---
 const MAX_HIT_CHARGE: float = 1.0
+const HIT_COOLDOWN_TIME: float = 1.0
 
 # --- EXPORTS ---
 # ID used to identify the player from other players
@@ -28,6 +29,7 @@ const MAX_HIT_CHARGE: float = 1.0
 @export var fall_acceleration: float = 75
 # TODO: WHAT is THIS FOR!
 @export var active_ability: AbilityComponent
+@export var dash_component: DashComponent
 
 # --- ONREADY ---
 @onready var early_hit_zone: Area3D = $OuterHitZone
@@ -35,6 +37,7 @@ const MAX_HIT_CHARGE: float = 1.0
 @onready var inner_hit_zone: Area3D = $InnerHitZone
 @onready var pivot = $Pivot
 @onready var character_model = $Pivot/Model
+@onready var hit_timer: Timer = Timer.new()
 
 ## Current player's velocity
 var target_velocity: Vector3 = Vector3.ZERO
@@ -65,6 +68,9 @@ var animation_player: AnimationPlayer = null
 ## Used to know when a player has started to charge a shot
 var shot_started: int
 
+## Used to check if the hit action is in cooldown
+var hit_in_cooldown: bool = false
+
 ## Player's current state
 var _state: PlayerState
 
@@ -72,6 +78,11 @@ var _state: PlayerState
 func _ready():
 	_state = PlayerPlayState.new()
 	animation_player = character_model.get_node("./AnimationPlayer")
+	add_child(hit_timer)
+
+	hit_timer.wait_time = HIT_COOLDOWN_TIME
+	hit_timer.one_shot = true
+	hit_timer.timeout.connect(_on_hit_timer_timeout)
 
 	early_hit_zone.body_entered.connect(_on_early_hit_zone_body_entered)
 	early_hit_zone.body_exited.connect(_on_early_hit_zone_body_exited)
@@ -113,7 +124,7 @@ func change_to_serve_state(serving_position: Vector3):
 
 
 ## Changes the [Player] current state to [PlayState]
-func change_to_play_state(new_ball: Ball):
+func change_to_play_state(_new_ball: Ball):
 	_state = PlayerPlayState.new()
 
 
@@ -198,10 +209,17 @@ func _get_shot_speed(seconds_charged: float, lift_angle: float):
 func free_input():
 	if Input.is_action_just_pressed("activate_skill_" + str(player_id)) and active_ability:
 		active_ability.activate()
-	if Input.is_action_just_pressed("hit_ball_" + str(player_id)):
+	if Input.is_action_just_pressed("dash_" + str(player_id)) and dash_component:
+		dash_component.activate()
+	if Input.is_action_just_pressed("hit_ball_" + str(player_id)) and not hit_in_cooldown:
 		shot_started = Time.get_ticks_msec()
-	elif Input.is_action_just_released("hit_ball_" + str(player_id)):
+	elif Input.is_action_just_released("hit_ball_" + str(player_id)) and not hit_in_cooldown:
 		var pressed_seconds: float = (Time.get_ticks_msec() - shot_started) / 1000.0
+		## Activate can hit cooldown timer
+		# hit_timer.start()
+		hit_timer.call_deferred("start")
+		hit_in_cooldown = true
+
 		## Angle the describes the elevation of the hit
 		var lift_angle = deg_to_rad(15)
 		if ball_in_inner_zone:
@@ -296,3 +314,7 @@ func normal_movement(delta):
 	# Moving Character
 	velocity = target_velocity
 	move_and_slide()
+
+
+func _on_hit_timer_timeout():
+	hit_in_cooldown = false
