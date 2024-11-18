@@ -128,8 +128,9 @@ func _load_players() -> Array[Player]:
 
 ## Callback function when a [Player] hits a ball with power
 func _on_player_ball_hit_power(
-	_player_id: int, ball: Ball, shot_speed: float, lift_angle: float, rotation_angle: float
-):
+	_player_id: int, ball: Ball, shot_speed: float, speed_multiplier: float, lift_angle: float, rotation_angle: float):
+	# TODO: Check speed_multiplier not working as expected (keeps being 1)
+	print("[TEAM MANAGER] SPEED MULTIPLIER: ", speed_multiplier)
 	if not turn_to_hit:
 		return
 	turn_ended.emit()
@@ -137,7 +138,7 @@ func _on_player_ball_hit_power(
 		self.hit_direction * Vector3.LEFT, lift_angle
 	)
 	var shot_direction = lifted_vector.rotated(Vector3.UP, rotation_angle).normalized()
-	ball.redirect(shot_direction, shot_speed)
+	ball.redirect(shot_direction, shot_speed, speed_multiplier)
 
 
 ## Callback function when a [Player] hits a ball

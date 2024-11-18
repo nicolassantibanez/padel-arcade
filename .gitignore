@@ -2,6 +2,9 @@
 # VScode
 .vscode
 
+# Zed
+.zed
+
 # MacOs
 .DS_Store
 

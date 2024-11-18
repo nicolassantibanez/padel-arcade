@@ -2,21 +2,27 @@ extends CharacterBody3D
 class_name Ball
 ## Node that represents a Ball
 
+# --- SIGNALS ---
 signal cross_side
 signal ground_bounce(ball: Ball)
 signal wall_bounce(ball: Ball)
 signal fence_bounce(ball: Ball)
 signal net_bounce(ball: Ball)
 
+# --- CONSTS ---
+const BASE_FALL_ACC: float = 10
+
+# --- ONREADY ---
 @onready var ray_cast: RayCast3D = $RayCast3D
 @onready var debug_overlay: DebugOverlay = $DebugOverlay
 
+# --- EXPORT ---
 @export var MAX_SPEED = 300
 @export var fall_acc = 10
 @export var show_gizmos: bool = false
 
 ## How much air deaccelerates the ball
-var air_acc: float = 3
+var air_drag: float = 3
 ## Counts current ball bounces
 var bounces_count = 0
 ## Counts current ball bounces on the ground
@@ -30,6 +36,13 @@ var is_serve_ball: bool = false
 var first_bounce_was_net: bool = false
 var current_side: CourtSection.SECTION_TYPE
 
+func draw_trajectory() -> void:
+	var tsteps := 0.5 # Time elapsed between each iteration
+	## TODO: IDEA DE CÓMO HACER El LIGHTNING SHOT MÁS RÁPIDO!
+	## El principal problema, es que no puedo simplemente aumentar la velocidad de la
+	## pelota, pues a mayor velocidad, más lejos llegará. La idea es que mantenga su
+	## 'trayectoria' pero que la recorra más rápido. Cómo puedo hacer esto?
+	## YES: Aumentando la gravedad! O el DRAG del aire. Ahí tengo que ver bien cómo hacerlo
 
 func reset_bounce_count():
 	bounces_count = 0
@@ -49,10 +62,11 @@ func _process(_delta):
 			print("Side: ", collider.name)
 			current_side = collider.section_type
 			cross_side.emit()
+	# print("FALL_ACC:", self.fall_acc)
 
 
 func _physics_process(delta):
-	target_velocity = target_velocity - target_velocity.normalized() * air_acc * delta
+	target_velocity = target_velocity - target_velocity.normalized() * air_drag * delta
 
 	# Gravity
 	if not is_on_floor():
@@ -70,11 +84,16 @@ func _physics_process(delta):
 
 
 ## Redirects the ball trayectory, based on a certain direction and initial speed
-func redirect(shot_direction: Vector3, shot_speed: float):
+func redirect(shot_direction: Vector3, shot_speed: float, speed_multiplier: float):
 	self.reset_bounce_count()
 	self.is_serve_ball = false
 	self.direction = shot_direction
-	self.target_velocity = self.direction * shot_speed
+	self.target_velocity = self.direction * shot_speed * speed_multiplier
+	## Increase fall acceleration when speed_multiplier is above 1
+	## Follows the equation new_fall_acc = base_fall_acc * speed_multiplier^2 / normal_multiplier^2
+	## Where normal_multiplier is assume to be 1.
+	print("SPEED MULTIPLIER:", speed_multiplier)
+	self.fall_acc = BASE_FALL_ACC * pow(speed_multiplier, 2)
 
 
 ## @deprecated

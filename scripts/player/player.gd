@@ -6,9 +6,11 @@ extends CharacterBody3D
 # --- SIGNALS ---
 signal ball_hit(id: int, hit_angle: float, ball: Ball)
 ## TODO: Describe signal
-signal ball_hit_power(id: int, ball: Ball, speed: float, lift_angle: float, rotation_angle: float)
+signal ball_hit_power(id: int, ball: Ball, shot_speed: float, speed_multiplier: float, lift_angle: float, rotation_angle: float)
 # Signal used to notify when player has served
 signal service_hit(player: Player)
+# Signal that notifies when player has changed state
+signal state_changed(new_state: PlayerState)
 
 # --- ENUMS ---
 # Used to describe how the player hit the ball
@@ -17,6 +19,7 @@ enum hitType { EARLY_HIT, LATE_HIT, PERFECT_HIT }
 # --- CONSTS ---
 const MAX_HIT_CHARGE: float = 1.0
 const HIT_COOLDOWN_TIME: float = 1.0
+const HIT_LIFT_ANGLE: float  = deg_to_rad(15)
 
 # --- EXPORTS ---
 # ID used to identify the player from other players
@@ -25,6 +28,10 @@ const HIT_COOLDOWN_TIME: float = 1.0
 @export var default_speed: float = 7
 # Current player's speed
 @export var speed: float = 7
+# Base player shot speed
+@export var base_shot_speed: float = 1
+# Player's multiplier of i's base shot speed
+@export var shot_speed_multiplier: float = 1
 # Downward acceleration
 @export var fall_acceleration: float = 75
 # TODO: WHAT is THIS FOR!
@@ -106,11 +113,13 @@ func _physics_process(delta):
 func change_to_point_ended_state(_won: bool):
 	# TODO: Poner animaciones de victoria o derrota
 	_state = PlayerEndPointState.new()
+	state_changed.emit(PlayerEndPointState)
 
 
 ## Changes the [Player] current state to [WaitState]
 func change_to_wait_state(wait_position: Vector3):
 	_state = PlayerWaitState.new(self, wait_position)
+	state_changed.emit(PlayerWaitState)
 
 
 ## Changes the [Player] current state to [ReceiveState]
@@ -197,11 +206,7 @@ func _get_shot_speed(seconds_charged: float, lift_angle: float):
 	## If power is maximum -> the shot should travel at most 17.0 units
 	## FIX: The equations assume the ball is at ground level (which is not)
 	var shot_length = 6.0 + 8.0 * power
-	return sqrt(shot_length * 10 / sin(2 * lift_angle))
-	## Time Based speed (it is not working (dont) know why)
-	# Time to travel of the shot!
-	# var t = 5.0
-	# return shot_length / (cos(lift_angle) * t)
+	return sqrt(shot_length * 10 / sin(2 * lift_angle)) * base_shot_speed
 
 
 ## Manages input a [Player] executes inside a _process function
@@ -216,20 +221,21 @@ func free_input():
 	elif Input.is_action_just_released("hit_ball_" + str(player_id)) and not hit_in_cooldown:
 		var pressed_seconds: float = (Time.get_ticks_msec() - shot_started) / 1000.0
 		## Activate can hit cooldown timer
-		# hit_timer.start()
 		hit_timer.call_deferred("start")
 		hit_in_cooldown = true
 
 		## Angle the describes the elevation of the hit
-		var lift_angle = deg_to_rad(15)
+		var speed_multiplier = self.shot_speed_multiplier
+		print("[PLAYER] SHOT_SPEED_MULTIPLIER: ", speed_multiplier)
 		if ball_in_inner_zone:
 			## Angle that describes how far to the left or right it hit the ball
 			var hit_angle = 0
 			ball_hit_power.emit(
 				player_id,
 				ball_to_hit,
-				_get_shot_speed(pressed_seconds, lift_angle),
-				lift_angle,
+				_get_shot_speed(pressed_seconds, HIT_LIFT_ANGLE),
+				speed_multiplier,
+				HIT_LIFT_ANGLE,
 				hit_angle
 			)
 			print("PERFECT SHOT!")
@@ -238,8 +244,9 @@ func free_input():
 			ball_hit_power.emit(
 				player_id,
 				ball_to_hit,
-				_get_shot_speed(pressed_seconds, lift_angle),
-				lift_angle,
+				_get_shot_speed(pressed_seconds, HIT_LIFT_ANGLE),
+				speed_multiplier,
+				HIT_LIFT_ANGLE,
 				hit_angle
 			)
 			print("TOO LATE!")
@@ -248,8 +255,9 @@ func free_input():
 			ball_hit_power.emit(
 				player_id,
 				ball_to_hit,
-				_get_shot_speed(pressed_seconds, lift_angle),
-				lift_angle,
+				_get_shot_speed(pressed_seconds, HIT_LIFT_ANGLE),
+				speed_multiplier,
+				HIT_LIFT_ANGLE,
 				hit_angle
 			)
 			print("TOO EARLY!")

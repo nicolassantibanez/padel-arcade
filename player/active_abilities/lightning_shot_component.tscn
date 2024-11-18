@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://covvgdne7cbrh"]
+
+[ext_resource type="Script" path="res://player/active_abilities/lightning_shot_component.gd" id="1_e2mmf"]
+
+[node name="LightningShotComponent" type="Node3D"]
+script = ExtResource("1_e2mmf")

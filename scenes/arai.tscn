@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://bxjkarins58op"]
+[gd_scene load_steps=10 format=3 uid="uid://bxjkarins58op"]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_gffhl"]
 [ext_resource type="PackedScene" uid="uid://co3vt4erby6w6" path="res://art/player.glb" id="1_knvrf"]
 [ext_resource type="PackedScene" uid="uid://bc8e5lhtm3ctn" path="res://art/PadelBoyFIXED.glb" id="3_oq4eh"]
 [ext_resource type="PackedScene" uid="uid://ccpimojhtfoyh" path="res://models/BetterPadel_RY.glb" id="4_l1jv7"]
 [ext_resource type="PackedScene" uid="uid://o7q2nysujuwq" path="res://scenes/dash_component.tscn" id="5_mdg1y"]
+[ext_resource type="PackedScene" uid="uid://covvgdne7cbrh" path="res://player/active_abilities/lightning_shot_component.tscn" id="6_jipql"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vioid"]
 radius = 0.7
@@ -15,9 +16,10 @@ radius = 2.4
 [sub_resource type="SphereShape3D" id="SphereShape3D_pxuhf"]
 radius = 1.105
 
-[node name="Ray" type="CharacterBody3D" node_paths=PackedStringArray("dash_component")]
+[node name="Ray" type="CharacterBody3D" node_paths=PackedStringArray("active_ability", "dash_component")]
 collision_layer = 4
 script = ExtResource("1_gffhl")
+active_ability = NodePath("LightningShotComponent")
 dash_component = NodePath("DashComponent")
 
 [node name="Pivot" type="Node3D" parent="."]
@@ -64,4 +66,7 @@ shape = SubResource("SphereShape3D_pxuhf")
 [node name="DashComponent" parent="." node_paths=PackedStringArray("player_owner") instance=ExtResource("5_mdg1y")]
 max_uses = 2
 uses = 2
+player_owner = NodePath("..")
+
+[node name="LightningShotComponent" parent="." node_paths=PackedStringArray("player_owner") instance=ExtResource("6_jipql")]
 player_owner = NodePath("..")

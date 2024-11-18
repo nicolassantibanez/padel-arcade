@@ -240,7 +240,7 @@ func _on_team_turn_ended():
 
 
 ## Callback function when a [Team] hits a ball
-## @deprecateid
+## @deprecated
 func _on_team_ball_hit(hit_direction: int, hit_angle: float, ball_hit: Ball):
 	# TODO: Check if is this Team Turn to hit the ball!!! If not -> ignore it
 	# TODO: Dejarle esta responsabilidad al TeamManager. Y que cuando su jugador golpee
@@ -331,7 +331,7 @@ func _on_ball_wall_bounce(ball: Ball):
 
 ## Callback function when [Ball] bounces on the fence
 func _on_ball_fence_bounce(ball: Ball):
-	if ball.bounces_count == 1:  # No importa si la pelota cruza o no, siempre el primero choque con reja es falta
+	if ball.bounces_count == 1:  # No importa si la elota cruza o no, siempre el primero choque con reja es falta
 		call_fault(ball, FaultType.OUT)
 
 
