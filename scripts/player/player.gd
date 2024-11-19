@@ -11,6 +11,10 @@ signal ball_hit_power(id: int, ball: Ball, shot_speed: float, speed_multiplier: 
 signal service_hit(player: Player)
 # Signal that notifies when player has changed state
 signal state_changed(new_state: PlayerState)
+# Signal when player is charging a shot
+signal charging_shot_started(started_at: int)
+# Signal when player ends charging a shot
+signal charging_shot_ended(ended_at: int)
 
 # --- ENUMS ---
 # Used to describe how the player hit the ball
@@ -218,8 +222,11 @@ func free_input():
 		dash_component.activate()
 	if Input.is_action_just_pressed("hit_ball_" + str(player_id)) and not hit_in_cooldown:
 		shot_started = Time.get_ticks_msec()
+		charging_shot_started.emit(shot_started)
 	elif Input.is_action_just_released("hit_ball_" + str(player_id)) and not hit_in_cooldown:
-		var pressed_seconds: float = (Time.get_ticks_msec() - shot_started) / 1000.0
+		var ended_at = Time.get_ticks_msec()
+		var pressed_seconds: float = (ended_at - shot_started) / 1000.0
+		charging_shot_ended.emit(ended_at)
 		## Activate can hit cooldown timer
 		hit_timer.call_deferred("start")
 		hit_in_cooldown = true

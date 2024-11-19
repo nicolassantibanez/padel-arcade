@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://dlcvuqascij4u"]
+[gd_scene load_steps=10 format=3 uid="uid://dlcvuqascij4u"]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_7ava2"]
 [ext_resource type="PackedScene" uid="uid://co3vt4erby6w6" path="res://art/player.glb" id="2_a4pdg"]
 [ext_resource type="PackedScene" uid="uid://bc8e5lhtm3ctn" path="res://art/PadelBoyFIXED.glb" id="3_gh5dw"]
 [ext_resource type="PackedScene" uid="uid://dlbhqa3n3jsxq" path="res://models/BetterPadel_Sainti.glb" id="4_ij3cr"]
 [ext_resource type="PackedScene" uid="uid://o7q2nysujuwq" path="res://scenes/dash_component.tscn" id="5_ne02i"]
+[ext_resource type="PackedScene" uid="uid://bp7b80vsu1xgb" path="res://player/hit_meter.tscn" id="6_qba2t"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vioid"]
 radius = 0.7
@@ -63,3 +64,7 @@ shape = SubResource("SphereShape3D_pxuhf")
 
 [node name="DashComponent" parent="." node_paths=PackedStringArray("player_owner") instance=ExtResource("5_ne02i")]
 player_owner = NodePath("..")
+
+[node name="HitMeter" parent="." node_paths=PackedStringArray("player") instance=ExtResource("6_qba2t")]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.808353, 2.00059, 0)
+player = NodePath("..")

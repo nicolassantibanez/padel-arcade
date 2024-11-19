@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bxjkarins58op"]
+[gd_scene load_steps=11 format=3 uid="uid://bxjkarins58op"]
 
 [ext_resource type="Script" path="res://scripts/player/player.gd" id="1_gffhl"]
 [ext_resource type="PackedScene" uid="uid://co3vt4erby6w6" path="res://art/player.glb" id="1_knvrf"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://ccpimojhtfoyh" path="res://models/BetterPadel_RY.glb" id="4_l1jv7"]
 [ext_resource type="PackedScene" uid="uid://o7q2nysujuwq" path="res://scenes/dash_component.tscn" id="5_mdg1y"]
 [ext_resource type="PackedScene" uid="uid://covvgdne7cbrh" path="res://player/active_abilities/lightning_shot_component.tscn" id="6_jipql"]
+[ext_resource type="PackedScene" uid="uid://bp7b80vsu1xgb" path="res://player/hit_meter.tscn" id="7_ftaj4"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_vioid"]
 radius = 0.7
@@ -70,3 +71,7 @@ player_owner = NodePath("..")
 
 [node name="LightningShotComponent" parent="." node_paths=PackedStringArray("player_owner") instance=ExtResource("6_jipql")]
 player_owner = NodePath("..")
+
+[node name="HitMeter" parent="." node_paths=PackedStringArray("player") instance=ExtResource("7_ftaj4")]
+transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 0.808353, 2.00059, 0)
+player = NodePath("..")

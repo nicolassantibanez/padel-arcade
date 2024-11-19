@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3 uid="uid://bp7b80vsu1xgb"]
+
+[ext_resource type="Script" path="res://player/hit_meter.gd" id="1_bfm5y"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_y2k12"]
+viewport_path = NodePath("Sprite3D/SubViewport")
+
+[sub_resource type="Gradient" id="Gradient_53h3a"]
+offsets = PackedFloat32Array(0, 0.480144, 1)
+colors = PackedColorArray(0, 0.811765, 0.290196, 1, 0.961072, 0.836431, 0.235813, 1, 1, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_kkijd"]
+gradient = SubResource("Gradient_53h3a")
+
+[node name="HitMeter" type="Node3D"]
+script = ExtResource("1_bfm5y")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+billboard = 2
+no_depth_test = true
+texture = SubResource("ViewportTexture_y2k12")
+
+[node name="SubViewport" type="SubViewport" parent="Sprite3D"]
+transparent_bg = true
+size = Vector2i(1920, 1080)
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="Sprite3D/SubViewport"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -50.0
+offset_right = 500.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -1.5708
+pivot_offset = Vector2(500, 50)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+value = 100.0
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_kkijd")
