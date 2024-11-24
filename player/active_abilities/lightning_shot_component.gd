@@ -16,6 +16,7 @@ func activate():
 	if uses <= 0 or is_active:
 		return
 	super()
+	is_active = true
 	player_owner.shot_speed_multiplier = shot_speed_multiplier
 
 ## Callback function to deactivate ability when user hits the ball
