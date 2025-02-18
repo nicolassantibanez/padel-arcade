@@ -9,6 +9,8 @@ signal ball_hit(id: int, hit_angle: float, ball: Ball)
 signal ball_hit_power(id: int, ball: Ball, shot_speed: float, speed_multiplier: float, lift_angle: float, rotation_angle: float)
 # Signal used to notify when player has served
 signal service_hit(player: Player)
+# Signal used to notify when player has served
+signal service_power_hit(player: Player, angle_deviation: float, shot_speed: float)
 # Signal that notifies when player has changed state
 signal state_changed(new_state: PlayerState)
 # Signal when player is charging a shot

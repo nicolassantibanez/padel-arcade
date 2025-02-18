@@ -9,6 +9,7 @@ extends Node3D
 signal ball_hit(hit_direction: int, hit_angle: float, ball: Ball)
 signal ball_hit_power(hit_angle: float, ball: Ball, power: float)
 signal service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3)
+signal service_power_hit(hit_direction: int, hit_angle: float, power: float, ball_pos: Vector3)
 signal turn_ended
 
 ## Keeps the count of their own current game points
@@ -54,6 +55,7 @@ func _ready():
 		p.ball_hit.connect(_on_player_ball_hit)
 		p.ball_hit_power.connect(_on_player_ball_hit_power)
 		p.service_hit.connect(_on_player_service_hit)
+		p.service_power_hit.connect(_on_player_service_power_hit)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -147,6 +149,7 @@ func _on_player_ball_hit(_player_id: int, hit_angle: float, ball: Ball):
 
 
 ## Callback function when a [Player] serves
+## @deprecated
 func _on_player_service_hit(serving_player: Player):
 	# NEEDS:
 	# - Hit LEFT or RIGHT (depending court side and serving side)
@@ -155,3 +158,9 @@ func _on_player_service_hit(serving_player: Player):
 		var hit_angle = service_hit_angle
 		service_hit.emit(hit_direction, hit_angle, serving_player.global_position + Vector3.UP)
 	# _deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
+
+## Callback function when a [Player] serves
+func _on_player_service_power_hit(serving_player: Player, angle_devaition: float, shot_speed: float):
+	if players[serving_player_index].player_id == serving_player.player_id:
+		var hit_angle = service_hit_angle + angle_devaition
+		service_power_hit.emit(hit_direction, hit_angle, shot_speed, serving_player.global_position + Vector3.UP)

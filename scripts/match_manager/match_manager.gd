@@ -93,7 +93,8 @@ func _ready():
 		## Team's signals connections
 		# team.ball_hit.connect(_on_team_ball_hit)
 		team.turn_ended.connect(_on_team_turn_ended)
-		team.service_hit.connect(_on_team_service_hit)
+		team.service_power_hit.connect(_on_team_service_power_hit)
+		# team.service_hit.connect(_on_team_service_hit)
 		## Connect own signals to Teams
 		self.point_ended.connect(team.on_point_ended)
 		self.game_ended.connect(team.on_game_ended)
@@ -269,18 +270,30 @@ func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
 ##
 ## Creates new serve Ball
 ## Notifies every team that the service has been played
-func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3):
+func _on_team_service_power_hit(hit_direction: int, hit_angle: float, power: float, ball_pos: Vector3):
 	ball_in_hitter_side = true
 	is_serving = true
 	_end_current_team_turn()
-	var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle)
+	var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle, power)
 	serve_ended.emit(new_ball)
+
+## Callback function when the serving team plays it's service
+##
+## Creates new serve Ball
+## Notifies every team that the service has been played
+## @deprecated
+# func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3):
+# 		ball_in_hitter_side = true
+# 		is_serving = true
+# 		_end_current_team_turn()
+# 		var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle)
+# 		serve_ended.emit(new_ball)
 
 
 ## Creates a new ball for the match
 ## returns the new ball instance
 func create_new_ball(
-	ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_angle: float
+	ball_pos: Vector3, is_serve: bool, hit_direction: int, hit_angle: float, shot_speed: float
 ) -> Ball:
 	var ball_instance: Node = ball_scene.instantiate()
 	ball_instance.position = ball_pos + Vector3(0, 0, hit_direction)
@@ -288,6 +301,7 @@ func create_new_ball(
 	current_ball = ball_instance
 	ball_instance.direction = Vector3(0, 0.3, hit_direction).rotated(Vector3.UP, hit_angle)
 	add_child(ball_instance)
+	ball_instance.target_velocity = ball_instance.direction * shot_speed
 	_connect_to_ball_signals(current_ball)
 	return ball_instance
 

@@ -4,3 +4,4 @@
 
 [node name="LightningShotComponent" type="Node3D"]
 script = ExtResource("1_e2mmf")
+shot_speed_multiplier = 1.5

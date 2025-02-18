@@ -4,38 +4,50 @@ class_name PlayerServeState
 
 # var player: Player
 var debug_marker_scene: Resource = preload ("res://scenes/debug_marker.tscn")
+var shot_rotation: float = 0.0
 
 func _init(a_player: Player, serving_position: Vector3):
 	print("IN PLAYER SERVE STATE!")
 	var player = a_player
 	player.global_position = Vector3(serving_position.x, serving_position.y, serving_position.z)
 
-func handle_input(_delta: float, player: Player):
+func handle_input(delta: float, player: Player):
 	# Serve mechanics
 	# if press serving button
 	# then throw ball to diagonal square
 	# Emit signal, that u have serve
 	# Manager passes to play state & so do players
 	if Input.is_action_just_pressed("hit_ball_" + str(player.player_id)):
-		player.service_hit.emit(player)
+		player.shot_started = Time.get_ticks_msec()
+		player.charging_shot_started.emit(player.shot_started)
+	elif Input.is_action_just_released("hit_ball_" + str(player.player_id)):
+		var ended_at = Time.get_ticks_msec()
+		var pressed_seconds: float = (ended_at - player.shot_started) / 1000.0
+		player.charging_shot_ended.emit(ended_at)
+		## Activate can hit cooldown timer
+		player.hit_timer.call_deferred("start")
+		# hit_in_cooldown = true
+		player.service_power_hit.emit(player, shot_rotation, player._get_shot_speed(pressed_seconds, player.HIT_LIFT_ANGLE))
+		# player.service_hit.emit(player)
 
 func update(delta: float, player: Player):
 	var direction = Vector3.ZERO
 
 	# We check for each move input and update the direction accordingly
+	# if Input.is_action_pressed("move_right_" + str(player.player_id)):
+	# 	direction.x += 1
+	# if Input.is_action_pressed("move_left_" + str(player.player_id)):
+	# 	direction.x -= 1
 	if Input.is_action_pressed("move_right_" + str(player.player_id)):
-		direction.x += 1
+		shot_rotation = min(shot_rotation - delta, - 50 * PI / 180)
 	if Input.is_action_pressed("move_left_" + str(player.player_id)):
-		direction.x -= 1
-	# if Input.is_action_pressed("move_back_" + str(player.player_id)):
-	#     direction.z += 1
-	# if Input.is_action_pressed("move_forward_" + str(player.player_id)):
-	#     direction.z -= 1
+		shot_rotation = maxf(shot_rotation + delta, 50 * PI / 180)
 
 	if direction != Vector3.ZERO: # Si nos estamos moviendo
 		direction = direction.normalized()
 		player.animation_player.play("Walk")
 		# Setting the basis property will affect the rotation of the node.
+		# TODO: Que el jugador mire al frente.
 		player.pivot.basis = Basis.looking_at(direction)
 	else: # No moving
 		player.animation_player.play("Idle")
