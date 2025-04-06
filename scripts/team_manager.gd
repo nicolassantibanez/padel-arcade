@@ -130,7 +130,13 @@ func _load_players() -> Array[Player]:
 
 ## Callback function when a [Player] hits a ball with power
 func _on_player_ball_hit_power(
-	_player_id: int, ball: Ball, shot_speed: float, speed_multiplier: float, lift_angle: float, rotation_angle: float):
+	_player_id: int,
+	ball: Ball,
+	shot_speed: float,
+	speed_multiplier: float,
+	lift_angle: float,
+	rotation_angle: float
+):
 	# TODO: Check speed_multiplier not working as expected (keeps being 1)
 	print("[TEAM MANAGER] SPEED MULTIPLIER: ", speed_multiplier)
 	if not turn_to_hit:
@@ -159,8 +165,13 @@ func _on_player_service_hit(serving_player: Player):
 		service_hit.emit(hit_direction, hit_angle, serving_player.global_position + Vector3.UP)
 	# _deprecated_copy_ball_on_hit(ball, hit_direction, hit_angle)
 
+
 ## Callback function when a [Player] serves
-func _on_player_service_power_hit(serving_player: Player, angle_devaition: float, shot_speed: float):
+func _on_player_service_power_hit(
+	serving_player: Player, angle_devaition: float, shot_speed: float
+):
 	if players[serving_player_index].player_id == serving_player.player_id:
 		var hit_angle = service_hit_angle + angle_devaition
-		service_power_hit.emit(hit_direction, hit_angle, shot_speed, serving_player.global_position + Vector3.UP)
+		service_power_hit.emit(
+			hit_direction, hit_angle, shot_speed, serving_player.global_position + Vector3.UP
+		)

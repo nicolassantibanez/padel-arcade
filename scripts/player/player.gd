@@ -6,7 +6,14 @@ extends CharacterBody3D
 # --- SIGNALS ---
 signal ball_hit(id: int, hit_angle: float, ball: Ball)
 ## TODO: Describe signal
-signal ball_hit_power(id: int, ball: Ball, shot_speed: float, speed_multiplier: float, lift_angle: float, rotation_angle: float)
+signal ball_hit_power(
+	id: int,
+	ball: Ball,
+	shot_speed: float,
+	speed_multiplier: float,
+	lift_angle: float,
+	rotation_angle: float
+)
 # Signal used to notify when player has served
 signal service_hit(player: Player)
 # Signal used to notify when player has served
@@ -25,7 +32,7 @@ enum hitType { EARLY_HIT, LATE_HIT, PERFECT_HIT }
 # --- CONSTS ---
 const MAX_HIT_CHARGE: float = 1.0
 const HIT_COOLDOWN_TIME: float = 1.0
-const HIT_LIFT_ANGLE: float  = deg_to_rad(15)
+const HIT_LIFT_ANGLE: float = deg_to_rad(15)
 
 # --- EXPORTS ---
 # ID used to identify the player from other players
@@ -85,11 +92,27 @@ var shot_started: int
 var hit_in_cooldown: bool = false
 
 ## Player's current state
-var _state: PlayerState
+var _state: PlayerState:
+	set(state):
+		_state = state
+
+
+func start_charging_service():
+	shot_started = Time.get_ticks_msec()
+	charging_shot_started.emit(shot_started)
+
+
+func hit_service(angle_deviation: float):
+	var ended_at = Time.get_ticks_msec()
+	var pressed_seconds: float = (ended_at - shot_started) / 1000.0
+	charging_shot_ended.emit(ended_at)
+	## Activate can hit cooldown timer
+	hit_timer.call_deferred("start")
+	service_power_hit.emit(self, angle_deviation, _get_shot_speed(pressed_seconds, HIT_LIFT_ANGLE))
 
 
 func _ready():
-	_state = PlayerPlayState.new()
+	_state = PlayerPlayState.new(self)
 	animation_player = character_model.get_node("./AnimationPlayer")
 	add_child(hit_timer)
 
@@ -108,39 +131,39 @@ func _ready():
 
 
 func _process(delta):
-	_state.handle_input(delta, self)
+	_state.handle_process(delta)
 
 
 func _physics_process(delta):
-	_state.update(delta, self)
+	_state.handle_physics_process(delta)
 
 
-## Changes the [Player] current state to [EndPointState]
+## Changes the [Player] current state to [PlayerPointEndedState]
 func change_to_point_ended_state(_won: bool):
 	# TODO: Poner animaciones de victoria o derrota
-	_state = PlayerEndPointState.new()
-	state_changed.emit(PlayerEndPointState)
+	_state.to_point_ended_state()
+	state_changed.emit(PlayerPointEndedState)
 
 
 ## Changes the [Player] current state to [WaitState]
 func change_to_wait_state(wait_position: Vector3):
-	_state = PlayerWaitState.new(self, wait_position)
+	_state.to_wait_state(wait_position)
 	state_changed.emit(PlayerWaitState)
 
 
 ## Changes the [Player] current state to [ReceiveState]
 func change_to_receive_state(receive_position: Vector3):
-	_state = PlayerReceiveState.new(self, receive_position)
+	_state.to_receive_state(receive_position)
 
 
 ## Changes the [Player] current state to [ServeState]
-func change_to_serve_state(serving_position: Vector3):
-	_state = PlayerServeState.new(self, serving_position)
+func change_to_serve_state(serving_position: Vector3, service_hit_angle: float):
+	_state.to_serve_state(serving_position, service_hit_angle)
 
 
 ## Changes the [Player] current state to [PlayState]
 func change_to_play_state(_new_ball: Ball):
-	_state = PlayerPlayState.new()
+	_state.to_play_state()
 
 
 ## Callback function for ball entering the early hit zone
