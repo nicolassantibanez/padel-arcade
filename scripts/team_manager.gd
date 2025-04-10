@@ -80,7 +80,9 @@ func change_to_serve_state(turn_to_serve: bool, serving_zone: Dictionary):
 		var player = players[i]
 		if is_team_serving:
 			if i == serving_player_index:
-				player.change_to_serve_state(serving_zone["server_pos"])
+				player.change_to_serve_state(
+					serving_zone["server_pos"], service_hit_angle, hit_direction
+				)
 			else:
 				player.change_to_wait_state(serving_zone["teammate_pos"])
 		else:
@@ -167,11 +169,9 @@ func _on_player_service_hit(serving_player: Player):
 
 
 ## Callback function when a [Player] serves
-func _on_player_service_power_hit(
-	serving_player: Player, angle_devaition: float, shot_speed: float
-):
+func _on_player_service_power_hit(serving_player: Player, hit_angle: float, shot_speed: float):
 	if players[serving_player_index].player_id == serving_player.player_id:
-		var hit_angle = service_hit_angle + angle_devaition
+		# var hit_angle = service_hit_angle + angle_devaition
 		service_power_hit.emit(
 			hit_direction, hit_angle, shot_speed, serving_player.global_position + Vector3.UP
 		)
