@@ -92,9 +92,7 @@ var shot_started: int
 var hit_in_cooldown: bool = false
 
 ## Player's current state
-var _state: PlayerState:
-	set(state):
-		_state = state
+var state: PlayerState
 
 
 func start_charging_service():
@@ -112,7 +110,7 @@ func hit_service(angle_deviation: float):
 
 
 func _ready():
-	_state = PlayerPlayState.new(self)
+	state = PlayerPlayState.new(self)
 	animation_player = character_model.get_node("./AnimationPlayer")
 	add_child(hit_timer)
 
@@ -131,39 +129,39 @@ func _ready():
 
 
 func _process(delta):
-	_state.handle_process(delta)
+	state.handle_process(delta)
 
 
 func _physics_process(delta):
-	_state.handle_physics_process(delta)
+	state.handle_physics_process(delta)
 
 
 ## Changes the [Player] current state to [PlayerPointEndedState]
 func change_to_point_ended_state(_won: bool):
 	# TODO: Poner animaciones de victoria o derrota
-	_state.to_point_ended_state()
+	state.to_point_ended_state()
 	state_changed.emit(PlayerPointEndedState)
 
 
 ## Changes the [Player] current state to [WaitState]
 func change_to_wait_state(wait_position: Vector3):
-	_state.to_wait_state(wait_position)
+	state.to_wait_state(wait_position)
 	state_changed.emit(PlayerWaitState)
 
 
 ## Changes the [Player] current state to [ReceiveState]
 func change_to_receive_state(receive_position: Vector3):
-	_state.to_receive_state(receive_position)
+	state.to_receive_state(receive_position)
 
 
 ## Changes the [Player] current state to [ServeState]
-func change_to_serve_state(serving_position: Vector3, service_hit_angle: float):
-	_state.to_serve_state(serving_position, service_hit_angle)
+func change_to_serve_state(serving_position: Vector3, service_hit_angle: float, hit_direction: int):
+	state.to_serve_state(serving_position, service_hit_angle, hit_direction)
 
 
 ## Changes the [Player] current state to [PlayState]
 func change_to_play_state(_new_ball: Ball):
-	_state.to_play_state()
+	state.to_play_state()
 
 
 ## Callback function for ball entering the early hit zone
