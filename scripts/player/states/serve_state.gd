@@ -34,6 +34,7 @@ func handle_process(_delta: float):
 		player.start_charging_service()
 	elif Input.is_action_just_released("hit_ball_" + str(player.player_id)):
 		player.hit_service(shot_rotation)
+		player.remove_child(arrow)
 
 
 func handle_physics_process(delta: float):
