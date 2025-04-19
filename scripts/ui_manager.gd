@@ -18,7 +18,7 @@ func _get_configuration_warnings():
 	var warnings = []
 
 	for co_node in get_parent().get_children():
-		if is_instance_of(co_node, match_manager):
+		if is_instance_of(co_node, MatchManager):
 			match_manager = co_node
 
 	if not match_manager:
@@ -70,6 +70,7 @@ func _set_labels_text():
 
 func _connect_match_manager_signals():
 	match_manager.fault_called.connect(on_match_manager_fault_called)
+	match_manager.update_points_ui.connect(on_update_points)
 
 
 func _load_dependencies():

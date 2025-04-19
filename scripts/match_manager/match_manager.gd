@@ -51,8 +51,6 @@ var serving_team_index: int
 var current_turn_index: int
 ## Index of the last turn [Team]
 var last_turn_index: int
-## Reference to the UI_Manager
-var ui_manager: UIManager
 ## Reference to the Court node
 var court: Court
 ## Current playing ball
@@ -70,13 +68,24 @@ var ball_in_hitter_side = true
 ## Use setters to update the configuration warning automatically.
 func _get_configuration_warnings():
 	var warnings = []
-
+	var tm_count = 0
 	for co_node in get_parent().get_children():
-		if is_instance_of(co_node, UIManager):
-			ui_manager = co_node
+		if is_instance_of(co_node, TeamManager):
+			tm_count += 1
+		elif is_instance_of(co_node, Court):
+			court = co_node
 
-	if not ui_manager:
-		warnings.append("UIManager is missing in the scene tree!")
+	if tm_count < 2:
+		warnings.append("MatchManager: Missing %s TeamManager" % tm_count)
+	elif tm_count > 2:
+		warnings.append(
+			(
+				"MatchManager: Incorrect number of TeamManager nodes. Expected 2, but there are %s"
+				% tm_count
+			)
+		)
+	if not court:
+		warnings.append("MatchManager: missing Court in scene tree!")
 
 	# Returning an empty array means "no warning".
 	return warnings
@@ -102,8 +111,6 @@ func _ready():
 		self.game_ended.connect(team.on_game_ended)
 		self.set_ended.connect(team.on_set_ended)
 		self.serve_ended.connect(team.on_serve_ended)
-	## Connect UIManager's signals
-	update_points_ui.connect(ui_manager.on_update_points)
 	# Connect Court's signals
 	# court.front_side_ball_touch.connect(_on_court_front_side_ball_touch)
 	# court.back_side_ball_touch.connect(_on_court_back_side_ball_touch)
@@ -140,8 +147,6 @@ func _load_dependencies():
 		if is_instance_of(co_node, TeamManager):
 			teams.append(co_node)
 			co_node.points = 0
-		elif is_instance_of(co_node, UIManager):
-			ui_manager = co_node
 		elif is_instance_of(co_node, Court):
 			court = co_node
 
