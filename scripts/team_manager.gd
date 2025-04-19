@@ -171,7 +171,6 @@ func _on_player_service_hit(serving_player: Player):
 ## Callback function when a [Player] serves
 func _on_player_service_power_hit(serving_player: Player, hit_angle: float, shot_speed: float):
 	if players[serving_player_index].player_id == serving_player.player_id:
-		# var hit_angle = service_hit_angle + angle_devaition
 		service_power_hit.emit(
 			hit_direction, hit_angle, shot_speed, serving_player.global_position + Vector3.UP
 		)

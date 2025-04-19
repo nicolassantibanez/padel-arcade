@@ -15,6 +15,8 @@ signal set_ended
 signal match_ended
 ## Emitted when the serve has ended
 signal serve_ended(new_ball: Ball)
+## Emitted when there is a fault
+signal fault_called(fault: FaultType)
 
 ## --- CONSTs ---
 const ball_scene: Resource = preload("res://scenes/ball.tscn")
@@ -270,24 +272,14 @@ func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
 ##
 ## Creates new serve Ball
 ## Notifies every team that the service has been played
-func _on_team_service_power_hit(hit_direction: int, hit_angle: float, power: float, ball_pos: Vector3):
+func _on_team_service_power_hit(
+	hit_direction: int, hit_angle: float, power: float, ball_pos: Vector3
+):
 	ball_in_hitter_side = true
 	is_serving = true
 	_end_current_team_turn()
 	var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle, power)
 	serve_ended.emit(new_ball)
-
-## Callback function when the serving team plays it's service
-##
-## Creates new serve Ball
-## Notifies every team that the service has been played
-## @deprecated
-# func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3):
-# 		ball_in_hitter_side = true
-# 		is_serving = true
-# 		_end_current_team_turn()
-# 		var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle)
-# 		serve_ended.emit(new_ball)
 
 
 ## Creates a new ball for the match
@@ -366,7 +358,9 @@ func _on_ball_cross_side():
 ## This ends the point or sends you to seconds service
 func call_fault(ball: Ball, fault: FaultType):
 	print("FAULT!")
+	fault_called.emit(fault)
 	ball.disable_detector()
+	await get_tree().create_timer(2).timeout
 	if is_serving and fault != FaultType.DOUBLE_BOUNCE:
 		print("INVALID SERVE!")
 		if is_second_service:
@@ -382,5 +376,4 @@ func call_fault(ball: Ball, fault: FaultType):
 				go_to_point_ended(teams[next_team_index(last_turn_index)], teams[last_turn_index])
 			FaultType.DOUBLE_BOUNCE:
 				go_to_point_ended(teams[last_turn_index], teams[next_team_index(last_turn_index)])
-
 	ball.queue_free()
