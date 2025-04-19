@@ -15,6 +15,8 @@ signal set_ended
 signal match_ended
 ## Emitted when the serve has ended
 signal serve_ended(new_ball: Ball)
+## Emitted when there is a fault
+signal fault_called(fault: FaultType)
 
 ## --- CONSTs ---
 const ball_scene: Resource = preload("res://scenes/ball.tscn")
@@ -49,8 +51,6 @@ var serving_team_index: int
 var current_turn_index: int
 ## Index of the last turn [Team]
 var last_turn_index: int
-## Reference to the UI_Manager
-var ui_manager: UIManager
 ## Reference to the Court node
 var court: Court
 ## Current playing ball
@@ -68,13 +68,24 @@ var ball_in_hitter_side = true
 ## Use setters to update the configuration warning automatically.
 func _get_configuration_warnings():
 	var warnings = []
-
+	var tm_count = 0
 	for co_node in get_parent().get_children():
-		if is_instance_of(co_node, UIManager):
-			ui_manager = co_node
+		if is_instance_of(co_node, TeamManager):
+			tm_count += 1
+		elif is_instance_of(co_node, Court):
+			court = co_node
 
-	if not ui_manager:
-		warnings.append("UIManager is missing in the scene tree!")
+	if tm_count < 2:
+		warnings.append("MatchManager: Missing %s TeamManager" % tm_count)
+	elif tm_count > 2:
+		warnings.append(
+			(
+				"MatchManager: Incorrect number of TeamManager nodes. Expected 2, but there are %s"
+				% tm_count
+			)
+		)
+	if not court:
+		warnings.append("MatchManager: missing Court in scene tree!")
 
 	# Returning an empty array means "no warning".
 	return warnings
@@ -100,8 +111,6 @@ func _ready():
 		self.game_ended.connect(team.on_game_ended)
 		self.set_ended.connect(team.on_set_ended)
 		self.serve_ended.connect(team.on_serve_ended)
-	## Connect UIManager's signals
-	update_points_ui.connect(ui_manager.on_update_points)
 	# Connect Court's signals
 	# court.front_side_ball_touch.connect(_on_court_front_side_ball_touch)
 	# court.back_side_ball_touch.connect(_on_court_back_side_ball_touch)
@@ -138,8 +147,6 @@ func _load_dependencies():
 		if is_instance_of(co_node, TeamManager):
 			teams.append(co_node)
 			co_node.points = 0
-		elif is_instance_of(co_node, UIManager):
-			ui_manager = co_node
 		elif is_instance_of(co_node, Court):
 			court = co_node
 
@@ -270,24 +277,14 @@ func redirect_ball(hit_direction: int, hit_angle: float, ball: Ball):
 ##
 ## Creates new serve Ball
 ## Notifies every team that the service has been played
-func _on_team_service_power_hit(hit_direction: int, hit_angle: float, power: float, ball_pos: Vector3):
+func _on_team_service_power_hit(
+	hit_direction: int, hit_angle: float, power: float, ball_pos: Vector3
+):
 	ball_in_hitter_side = true
 	is_serving = true
 	_end_current_team_turn()
 	var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle, power)
 	serve_ended.emit(new_ball)
-
-## Callback function when the serving team plays it's service
-##
-## Creates new serve Ball
-## Notifies every team that the service has been played
-## @deprecated
-# func _on_team_service_hit(hit_direction: int, hit_angle: float, ball_pos: Vector3):
-# 		ball_in_hitter_side = true
-# 		is_serving = true
-# 		_end_current_team_turn()
-# 		var new_ball: Ball = create_new_ball(ball_pos, true, hit_direction, hit_angle)
-# 		serve_ended.emit(new_ball)
 
 
 ## Creates a new ball for the match
@@ -366,7 +363,9 @@ func _on_ball_cross_side():
 ## This ends the point or sends you to seconds service
 func call_fault(ball: Ball, fault: FaultType):
 	print("FAULT!")
+	fault_called.emit(fault)
 	ball.disable_detector()
+	await get_tree().create_timer(2).timeout
 	if is_serving and fault != FaultType.DOUBLE_BOUNCE:
 		print("INVALID SERVE!")
 		if is_second_service:
@@ -382,5 +381,4 @@ func call_fault(ball: Ball, fault: FaultType):
 				go_to_point_ended(teams[next_team_index(last_turn_index)], teams[last_turn_index])
 			FaultType.DOUBLE_BOUNCE:
 				go_to_point_ended(teams[last_turn_index], teams[next_team_index(last_turn_index)])
-
 	ball.queue_free()

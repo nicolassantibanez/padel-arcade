@@ -1,9 +1,12 @@
-[gd_scene load_steps=3 format=3 uid="uid://wn5bfvtvc1ij"]
+[gd_scene load_steps=4 format=3 uid="uid://wn5bfvtvc1ij"]
 
 [ext_resource type="Script" path="res://scripts/ui_manager.gd" id="1_mck10"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_0heul"]
 font_size = 42
+
+[sub_resource type="LabelSettings" id="LabelSettings_4av5s"]
+font_size = 52
 
 [node name="UI Manager" type="Control"]
 layout_mode = 3
@@ -14,85 +17,123 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mck10")
 
-[node name="HBoxContainer" type="CenterContainer" parent="."]
-layout_mode = 0
-offset_left = 38.0
-offset_top = 896.0
-offset_right = 947.0
-offset_bottom = 1024.0
+[node name="GridContainer" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VSplitContainer" type="VSplitContainer" parent="HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BottomContainer" type="HBoxContainer" parent="GridContainer"]
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VSplitContainer" type="VSplitContainer" parent="GridContainer/BottomContainer"]
 custom_minimum_size = Vector2(500, 2.08165e-12)
 layout_mode = 2
+size_flags_vertical = 4
 
-[node name="TopPanel" type="PanelContainer" parent="HBoxContainer/VSplitContainer"]
+[node name="TopPanel" type="PanelContainer" parent="GridContainer/BottomContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/BottomContainer/VSplitContainer/TopPanel"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VSplitContainer/TopPanel"]
-layout_mode = 2
-
-[node name="PlayerLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+[node name="PlayerLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/TopPanel/HBoxContainer"]
 layout_mode = 2
 text = "P1: "
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="PointsLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+[node name="PointsLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/TopPanel/HBoxContainer"]
 layout_mode = 2
 text = "0"
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="Divider" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+[node name="Divider" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/TopPanel/HBoxContainer"]
 layout_mode = 2
 text = " | "
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="GamesLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+[node name="GamesLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/TopPanel/HBoxContainer"]
 layout_mode = 2
 text = "0"
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="Divider2" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+[node name="Divider2" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/TopPanel/HBoxContainer"]
 layout_mode = 2
 text = " | "
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="SetsLabel" type="Label" parent="HBoxContainer/VSplitContainer/TopPanel/HBoxContainer"]
+[node name="SetsLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/TopPanel/HBoxContainer"]
 layout_mode = 2
 text = "0"
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="BottomPanel" type="PanelContainer" parent="HBoxContainer/VSplitContainer"]
+[node name="BottomPanel" type="PanelContainer" parent="GridContainer/BottomContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GridContainer/BottomContainer/VSplitContainer/BottomPanel"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VSplitContainer/BottomPanel"]
-layout_mode = 2
-
-[node name="PlayerLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+[node name="PlayerLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/BottomPanel/HBoxContainer"]
 layout_mode = 2
 text = "P2: "
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="PointsLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+[node name="PointsLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/BottomPanel/HBoxContainer"]
 layout_mode = 2
 text = "0"
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="Divider" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+[node name="Divider" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/BottomPanel/HBoxContainer"]
 layout_mode = 2
 text = " | "
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="GamesLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+[node name="GamesLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/BottomPanel/HBoxContainer"]
 layout_mode = 2
 text = "0"
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="Divider2" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+[node name="Divider2" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/BottomPanel/HBoxContainer"]
 layout_mode = 2
 text = " | "
 label_settings = SubResource("LabelSettings_0heul")
 
-[node name="SetsLabel" type="Label" parent="HBoxContainer/VSplitContainer/BottomPanel/HBoxContainer"]
+[node name="SetsLabel" type="Label" parent="GridContainer/BottomContainer/VSplitContainer/BottomPanel/HBoxContainer"]
 layout_mode = 2
 text = "0"
 label_settings = SubResource("LabelSettings_0heul")
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="GridContainer/BottomContainer"]
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+
+[node name="FaultLabel" type="Label" parent="GridContainer/BottomContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "FAULT!"
+label_settings = SubResource("LabelSettings_4av5s")
